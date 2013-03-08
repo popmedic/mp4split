@@ -7,9 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <QTKit/QTKit.h>
 
 @interface POPAppDelegate : NSObject <NSApplicationDelegate>
-
+{
+	NSURL* source;
+}
 @property (assign) IBOutlet NSWindow *window;
+@property (assign) IBOutlet QTMovieView *mp4Player;
+- (IBAction)openMp4Click:(id)sender;
 
 @end

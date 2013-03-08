@@ -13,6 +13,8 @@
 		0A4766B816EA79A80028828B /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766B616EA79A80028828B /* Credits.rtf */; };
 		0A4766BB16EA79A80028828B /* POPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A4766BA16EA79A80028828B /* POPAppDelegate.m */; };
 		0A4766BE16EA79A80028828B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766BC16EA79A80028828B /* MainMenu.xib */; };
+		0A4766D616EA93C30028828B /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766D516EA93C30028828B /* icon.icns */; };
+		0A4766D816EA93D70028828B /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4766D716EA93D70028828B /* QTKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 		0A4766B916EA79A80028828B /* POPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = POPAppDelegate.h; sourceTree = "<group>"; };
 		0A4766BA16EA79A80028828B /* POPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = POPAppDelegate.m; sourceTree = "<group>"; };
 		0A4766BD16EA79A80028828B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		0A4766D516EA93C30028828B /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
+		0A4766D716EA93D70028828B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A4766D816EA93D70028828B /* QTKit.framework in Frameworks */,
 				0A4766A816EA79A80028828B /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -46,6 +51,8 @@
 		0A47669816EA79A70028828B = {
 			isa = PBXGroup;
 			children = (
+				0A4766D716EA93D70028828B /* QTKit.framework */,
+				0A4766D516EA93C30028828B /* icon.icns */,
 				0A4766AD16EA79A80028828B /* Mp4Split */,
 				0A4766A616EA79A70028828B /* Frameworks */,
 				0A4766A416EA79A70028828B /* Products */,
@@ -157,6 +164,7 @@
 				0A4766B216EA79A80028828B /* InfoPlist.strings in Resources */,
 				0A4766B816EA79A80028828B /* Credits.rtf in Resources */,
 				0A4766BE16EA79A80028828B /* MainMenu.xib in Resources */,
+				0A4766D616EA93C30028828B /* icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
