@@ -1,0 +1,303 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0A4766A816EA79A80028828B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4766A716EA79A70028828B /* Cocoa.framework */; };
+		0A4766B216EA79A80028828B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766B016EA79A80028828B /* InfoPlist.strings */; };
+		0A4766B416EA79A80028828B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A4766B316EA79A80028828B /* main.m */; };
+		0A4766B816EA79A80028828B /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766B616EA79A80028828B /* Credits.rtf */; };
+		0A4766BB16EA79A80028828B /* POPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A4766BA16EA79A80028828B /* POPAppDelegate.m */; };
+		0A4766BE16EA79A80028828B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766BC16EA79A80028828B /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0A4766A316EA79A70028828B /* Mp4Split.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mp4Split.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A4766A716EA79A70028828B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		0A4766AA16EA79A80028828B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		0A4766AB16EA79A80028828B /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		0A4766AC16EA79A80028828B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		0A4766AF16EA79A80028828B /* Mp4Split-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Mp4Split-Info.plist"; sourceTree = "<group>"; };
+		0A4766B116EA79A80028828B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0A4766B316EA79A80028828B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		0A4766B516EA79A80028828B /* Mp4Split-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Mp4Split-Prefix.pch"; sourceTree = "<group>"; };
+		0A4766B716EA79A80028828B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		0A4766B916EA79A80028828B /* POPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = POPAppDelegate.h; sourceTree = "<group>"; };
+		0A4766BA16EA79A80028828B /* POPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = POPAppDelegate.m; sourceTree = "<group>"; };
+		0A4766BD16EA79A80028828B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0A4766A016EA79A70028828B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A4766A816EA79A80028828B /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0A47669816EA79A70028828B = {
+			isa = PBXGroup;
+			children = (
+				0A4766AD16EA79A80028828B /* Mp4Split */,
+				0A4766A616EA79A70028828B /* Frameworks */,
+				0A4766A416EA79A70028828B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0A4766A416EA79A70028828B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0A4766A316EA79A70028828B /* Mp4Split.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0A4766A616EA79A70028828B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0A4766A716EA79A70028828B /* Cocoa.framework */,
+				0A4766A916EA79A80028828B /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		0A4766A916EA79A80028828B /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0A4766AA16EA79A80028828B /* AppKit.framework */,
+				0A4766AB16EA79A80028828B /* CoreData.framework */,
+				0A4766AC16EA79A80028828B /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		0A4766AD16EA79A80028828B /* Mp4Split */ = {
+			isa = PBXGroup;
+			children = (
+				0A4766B916EA79A80028828B /* POPAppDelegate.h */,
+				0A4766BA16EA79A80028828B /* POPAppDelegate.m */,
+				0A4766BC16EA79A80028828B /* MainMenu.xib */,
+				0A4766AE16EA79A80028828B /* Supporting Files */,
+			);
+			path = Mp4Split;
+			sourceTree = "<group>";
+		};
+		0A4766AE16EA79A80028828B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				0A4766AF16EA79A80028828B /* Mp4Split-Info.plist */,
+				0A4766B016EA79A80028828B /* InfoPlist.strings */,
+				0A4766B316EA79A80028828B /* main.m */,
+				0A4766B516EA79A80028828B /* Mp4Split-Prefix.pch */,
+				0A4766B616EA79A80028828B /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0A4766A216EA79A70028828B /* Mp4Split */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0A4766C116EA79A80028828B /* Build configuration list for PBXNativeTarget "Mp4Split" */;
+			buildPhases = (
+				0A47669F16EA79A70028828B /* Sources */,
+				0A4766A016EA79A70028828B /* Frameworks */,
+				0A4766A116EA79A70028828B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Mp4Split;
+			productName = Mp4Split;
+			productReference = 0A4766A316EA79A70028828B /* Mp4Split.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0A47669A16EA79A70028828B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = POP;
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = "Kevin Scardina";
+			};
+			buildConfigurationList = 0A47669D16EA79A70028828B /* Build configuration list for PBXProject "Mp4Split" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 0A47669816EA79A70028828B;
+			productRefGroup = 0A4766A416EA79A70028828B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0A4766A216EA79A70028828B /* Mp4Split */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0A4766A116EA79A70028828B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A4766B216EA79A80028828B /* InfoPlist.strings in Resources */,
+				0A4766B816EA79A80028828B /* Credits.rtf in Resources */,
+				0A4766BE16EA79A80028828B /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0A47669F16EA79A70028828B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A4766B416EA79A80028828B /* main.m in Sources */,
+				0A4766BB16EA79A80028828B /* POPAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		0A4766B016EA79A80028828B /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0A4766B116EA79A80028828B /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		0A4766B616EA79A80028828B /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0A4766B716EA79A80028828B /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		0A4766BC16EA79A80028828B /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0A4766BD16EA79A80028828B /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		0A4766BF16EA79A80028828B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		0A4766C016EA79A80028828B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		0A4766C216EA79A80028828B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Mp4Split/Mp4Split-Prefix.pch";
+				INFOPLIST_FILE = "Mp4Split/Mp4Split-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		0A4766C316EA79A80028828B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Mp4Split/Mp4Split-Prefix.pch";
+				INFOPLIST_FILE = "Mp4Split/Mp4Split-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0A47669D16EA79A70028828B /* Build configuration list for PBXProject "Mp4Split" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A4766BF16EA79A80028828B /* Debug */,
+				0A4766C016EA79A80028828B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0A4766C116EA79A80028828B /* Build configuration list for PBXNativeTarget "Mp4Split" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A4766C216EA79A80028828B /* Debug */,
+				0A4766C316EA79A80028828B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0A47669A16EA79A70028828B /* Project object */;
+}
