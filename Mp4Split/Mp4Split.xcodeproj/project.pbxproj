@@ -15,6 +15,12 @@
 		0A4766BE16EA79A80028828B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766BC16EA79A80028828B /* MainMenu.xib */; };
 		0A4766D616EA93C30028828B /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766D516EA93C30028828B /* icon.icns */; };
 		0A4766D816EA93D70028828B /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4766D716EA93D70028828B /* QTKit.framework */; };
+		0AB919F216EABDBD00119143 /* video.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919F116EABDBD00119143 /* video.png */; };
+		0AB919F616EAF09A00119143 /* POPTimeConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AB919F516EAF09A00119143 /* POPTimeConverter.m */; };
+		0AB919F916EB9B1600119143 /* mp4split-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919F716EB9B1600119143 /* mp4split-128.png */; };
+		0AB919FA16EB9B1600119143 /* mp4split-cancel-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919F816EB9B1600119143 /* mp4split-cancel-128.png */; };
+		0AB919FD16EBB1D400119143 /* pause-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919FB16EBB1D400119143 /* pause-128.png */; };
+		0AB919FE16EBB1D400119143 /* play-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919FC16EBB1D400119143 /* play-128.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +39,13 @@
 		0A4766BD16EA79A80028828B /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		0A4766D516EA93C30028828B /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		0A4766D716EA93D70028828B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
+		0AB919F116EABDBD00119143 /* video.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = video.png; path = artwork/video.png; sourceTree = "<group>"; };
+		0AB919F416EAF09A00119143 /* POPTimeConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = POPTimeConverter.h; sourceTree = "<group>"; };
+		0AB919F516EAF09A00119143 /* POPTimeConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = POPTimeConverter.m; sourceTree = "<group>"; };
+		0AB919F716EB9B1600119143 /* mp4split-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "mp4split-128.png"; path = "artwork/mp4split-128.png"; sourceTree = "<group>"; };
+		0AB919F816EB9B1600119143 /* mp4split-cancel-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "mp4split-cancel-128.png"; path = "artwork/mp4split-cancel-128.png"; sourceTree = "<group>"; };
+		0AB919FB16EBB1D400119143 /* pause-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "pause-128.png"; path = "artwork/pause-128.png"; sourceTree = "<group>"; };
+		0AB919FC16EBB1D400119143 /* play-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "play-128.png"; path = "artwork/play-128.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,8 +102,15 @@
 		0A4766AD16EA79A80028828B /* Mp4Split */ = {
 			isa = PBXGroup;
 			children = (
+				0AB919FB16EBB1D400119143 /* pause-128.png */,
+				0AB919FC16EBB1D400119143 /* play-128.png */,
+				0AB919F716EB9B1600119143 /* mp4split-128.png */,
+				0AB919F816EB9B1600119143 /* mp4split-cancel-128.png */,
+				0AB919F116EABDBD00119143 /* video.png */,
 				0A4766B916EA79A80028828B /* POPAppDelegate.h */,
 				0A4766BA16EA79A80028828B /* POPAppDelegate.m */,
+				0AB919F416EAF09A00119143 /* POPTimeConverter.h */,
+				0AB919F516EAF09A00119143 /* POPTimeConverter.m */,
 				0A4766BC16EA79A80028828B /* MainMenu.xib */,
 				0A4766AE16EA79A80028828B /* Supporting Files */,
 			);
@@ -165,6 +185,11 @@
 				0A4766B816EA79A80028828B /* Credits.rtf in Resources */,
 				0A4766BE16EA79A80028828B /* MainMenu.xib in Resources */,
 				0A4766D616EA93C30028828B /* icon.icns in Resources */,
+				0AB919F216EABDBD00119143 /* video.png in Resources */,
+				0AB919F916EB9B1600119143 /* mp4split-128.png in Resources */,
+				0AB919FA16EB9B1600119143 /* mp4split-cancel-128.png in Resources */,
+				0AB919FD16EBB1D400119143 /* pause-128.png in Resources */,
+				0AB919FE16EBB1D400119143 /* play-128.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,6 +202,7 @@
 			files = (
 				0A4766B416EA79A80028828B /* main.m in Sources */,
 				0A4766BB16EA79A80028828B /* POPAppDelegate.m in Sources */,
+				0AB919F616EAF09A00119143 /* POPTimeConverter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +330,7 @@
 				0A4766C316EA79A80028828B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
