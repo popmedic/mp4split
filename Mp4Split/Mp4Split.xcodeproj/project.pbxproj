@@ -21,6 +21,7 @@
 		0AB919FA16EB9B1600119143 /* mp4split-cancel-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919F816EB9B1600119143 /* mp4split-cancel-128.png */; };
 		0AB919FD16EBB1D400119143 /* pause-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919FB16EBB1D400119143 /* pause-128.png */; };
 		0AB919FE16EBB1D400119143 /* play-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919FC16EBB1D400119143 /* play-128.png */; };
+		0AB91A0516EBCFDF00119143 /* POPMp4Splitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AB91A0416EBCFDF00119143 /* POPMp4Splitter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,8 @@
 		0AB919F816EB9B1600119143 /* mp4split-cancel-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "mp4split-cancel-128.png"; path = "artwork/mp4split-cancel-128.png"; sourceTree = "<group>"; };
 		0AB919FB16EBB1D400119143 /* pause-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "pause-128.png"; path = "artwork/pause-128.png"; sourceTree = "<group>"; };
 		0AB919FC16EBB1D400119143 /* play-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "play-128.png"; path = "artwork/play-128.png"; sourceTree = "<group>"; };
+		0AB91A0316EBCFDF00119143 /* POPMp4Splitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = POPMp4Splitter.h; sourceTree = "<group>"; };
+		0AB91A0416EBCFDF00119143 /* POPMp4Splitter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = POPMp4Splitter.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +112,8 @@
 				0AB919F116EABDBD00119143 /* video.png */,
 				0A4766B916EA79A80028828B /* POPAppDelegate.h */,
 				0A4766BA16EA79A80028828B /* POPAppDelegate.m */,
+				0AB91A0316EBCFDF00119143 /* POPMp4Splitter.h */,
+				0AB91A0416EBCFDF00119143 /* POPMp4Splitter.m */,
 				0AB919F416EAF09A00119143 /* POPTimeConverter.h */,
 				0AB919F516EAF09A00119143 /* POPTimeConverter.m */,
 				0A4766BC16EA79A80028828B /* MainMenu.xib */,
@@ -203,6 +208,7 @@
 				0A4766B416EA79A80028828B /* main.m in Sources */,
 				0A4766BB16EA79A80028828B /* POPAppDelegate.m in Sources */,
 				0AB919F616EAF09A00119143 /* POPTimeConverter.m in Sources */,
+				0AB91A0516EBCFDF00119143 /* POPMp4Splitter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
