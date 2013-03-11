@@ -13,6 +13,9 @@
 {
 	float secs = ((float)qtTime.timeValue/(float)qtTime.timeScale);
 	return [POPTimeConverter timeStringFromSecs:secs];
+	/*NSString* rtn = QTStringFromTime(qtTime);
+	rtn = [[rtn substringFromIndex:[rtn rangeOfString:@":"].location+1] stringByDeletingLastPathComponent];
+	return rtn;*/
 }
 
 + (float) secsFromTimeString:(NSString*)str

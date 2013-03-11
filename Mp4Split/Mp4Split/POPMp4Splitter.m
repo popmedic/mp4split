@@ -32,8 +32,31 @@
 	[task setLaunchPath:ffmpeg_path];
 	[task setStandardOutput:[NSPipe pipe]];
 	[task setStandardError:[task standardOutput]];
-	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src,
+	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src, @"-copyts",
 						@"-acodec", @"copy", @"-vcodec", @"copy", dst,nil]];
+	return task;
+}
+
++(NSTask*) createConvertTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len{
+	
+	NSTask* task = [[NSTask alloc] init];
+	
+	NSString* ffmpeg_path = [[NSUserDefaults standardUserDefaults] objectForKey:@"ffmpeg-path"];
+	if(ffmpeg_path == nil) ffmpeg_path = @"";
+	if([ffmpeg_path compare:@""] == 0)
+	{
+		ffmpeg_path = [[NSBundle mainBundle] pathForResource:@"ffmpeg" ofType:nil];
+	}
+	
+	[task setLaunchPath:ffmpeg_path];
+	[task setStandardOutput:[NSPipe pipe]];
+	[task setStandardError:[task standardOutput]];
+	
+	dst = [[dst stringByDeletingPathExtension] stringByAppendingString:@".mp4"];
+	/*-acodec libfaac -ac 2 -ab 128k -vcodec libx264 -threads 0*/
+	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src, @"-copyts", @"-vsync", @"passthrough",
+						@"-acodec", @"libfaac", @"-ac", @"2", @"-ab", @"128k",
+						@"-vcodec", @"libx264", @"-threads", @"0", dst,nil]];
 	return task;
 }
 
@@ -48,8 +71,8 @@
 	}
 	
 	[task setLaunchPath:ffmpeg_path];
-	//[task setStandardOutput:[NSPipe pipe]];
-	//[task setStandardError:[task standardOutput]];
+	[task setStandardOutput:[NSPipe pipe]];
+	[task setStandardError:[task standardOutput]];
 	[task setArguments:[NSArray arrayWithObjects:@"-version", nil]];
 	[task launch];
 	[task waitUntilExit];
@@ -139,23 +162,29 @@
 		NSData* data = [[noti userInfo] objectForKey:NSFileHandleNotificationDataItem];
 		if([data length])
 		{
-			NSString* datastr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-			NSArray* lines = [datastr componentsSeparatedByString:@"\r"];
-			for (int i = 0; i < [lines count]; i++)
+			@try
 			{
-				NSString* line = lines[i];
-				NSRange rng = [line rangeOfString:@"time="];
-				if(rng.location != NSNotFound)
+				NSString* datastr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+				NSArray* lines = [datastr componentsSeparatedByString:@"\r"];
+				for (int i = 0; i < [lines count]; i++)
 				{
-					NSError* rxError;
-					NSRegularExpression* rx = [NSRegularExpression regularExpressionWithPattern:@"[0-9]{2}\\:[0-9]{2}\\:[0-9]{2}\\.{0,1}[0-9]{0,2}" options:NSRegularExpressionCaseInsensitive error:&rxError];
-					NSString* timeStr = [line substringWithRange:[rx rangeOfFirstMatchInString:line options:0 range:NSMakeRange(0,[line length])]];
-					float currentSecs = [POPTimeConverter secsFromTimeString:timeStr];
-					if(_delegate != nil)
+					NSString* line = lines[i];
+					NSRange rng = [line rangeOfString:@"time="];
+					if(rng.location != NSNotFound)
 					{
-						[_delegate mp4FileProgress:(currentSecs/currentTaskDuration)*100];
+						NSError* rxError;
+						NSRegularExpression* rx = [NSRegularExpression regularExpressionWithPattern:@"[0-9]{2}\\:[0-9]{2}\\:[0-9]{2}\\.{0,1}[0-9]{0,2}" options:NSRegularExpressionCaseInsensitive error:&rxError];
+						NSString* timeStr = [line substringWithRange:[rx rangeOfFirstMatchInString:line options:0 range:NSMakeRange(0,[line length])]];
+						float currentSecs = [POPTimeConverter secsFromTimeString:timeStr];
+						if(_delegate != nil)
+						{
+							[_delegate mp4FileProgress:(currentSecs/currentTaskDuration)*100];
+						}
 					}
 				}
+			}
+			@catch (NSException *e) {
+				//do nothing...
 			}
 			//NSLog(@"%@", datastr);
 		}

@@ -18,6 +18,7 @@
 
 +(BOOL) ffmpegIsWorking:(NSString*)ffmpeg_path;
 +(NSTask*) createTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len;
++(NSTask*) createConvertTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len;
 
 -(id) initWithTasks:(NSArray*)tsks;
 -(void) setDelegate:(id)delegate;

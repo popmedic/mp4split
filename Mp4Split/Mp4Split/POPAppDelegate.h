@@ -30,6 +30,7 @@
 @property (assign) IBOutlet NSTextField *preferencesFfmpegPathText;
 @property (assign) IBOutlet NSMatrix *preferencesOutputFolderMatrix;
 @property (assign) IBOutlet NSTextField *preferencesOutputFolderText;
+@property (assign) IBOutlet NSTextField *preferencesOutputFileTemplateText;
 
 - (IBAction)openMp4Click:(id)sender;
 - (IBAction)closeMp4Click:(id)sender;
