@@ -16,8 +16,6 @@
 		0A4766D616EA93C30028828B /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766D516EA93C30028828B /* icon.icns */; };
 		0A4766D816EA93D70028828B /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4766D716EA93D70028828B /* QTKit.framework */; };
 		0A750BEA16ED5E43008256E7 /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = 0A750BE916ED5E43008256E7 /* ffmpeg */; };
-		0A750BEE16ED8124008256E7 /* POPPreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A750BEC16ED8123008256E7 /* POPPreferencesWindowController.m */; };
-		0A750BEF16ED8124008256E7 /* POPPreferencesWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A750BED16ED8124008256E7 /* POPPreferencesWindowController.xib */; };
 		0AB919F216EABDBD00119143 /* video.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919F116EABDBD00119143 /* video.png */; };
 		0AB919F616EAF09A00119143 /* POPTimeConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AB919F516EAF09A00119143 /* POPTimeConverter.m */; };
 		0AB919F916EB9B1600119143 /* mp4split-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AB919F716EB9B1600119143 /* mp4split-128.png */; };
@@ -44,9 +42,6 @@
 		0A4766D516EA93C30028828B /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = ../icon.icns; sourceTree = "<group>"; };
 		0A4766D716EA93D70028828B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
 		0A750BE916ED5E43008256E7 /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = ffmpeg; path = bin/ffmpeg; sourceTree = "<group>"; };
-		0A750BEB16ED8123008256E7 /* POPPreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = POPPreferencesWindowController.h; sourceTree = "<group>"; };
-		0A750BEC16ED8123008256E7 /* POPPreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = POPPreferencesWindowController.m; sourceTree = "<group>"; };
-		0A750BED16ED8124008256E7 /* POPPreferencesWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = POPPreferencesWindowController.xib; sourceTree = "<group>"; };
 		0AB919F116EABDBD00119143 /* video.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = video.png; path = artwork/video.png; sourceTree = "<group>"; };
 		0AB919F416EAF09A00119143 /* POPTimeConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = POPTimeConverter.h; sourceTree = "<group>"; };
 		0AB919F516EAF09A00119143 /* POPTimeConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = POPTimeConverter.m; sourceTree = "<group>"; };
@@ -112,7 +107,6 @@
 			isa = PBXGroup;
 			children = (
 				0A750BF216ED8200008256E7 /* Main Window */,
-				0A750BF016ED8191008256E7 /* Preferences Window */,
 				0A750BF316ED8249008256E7 /* Classes */,
 				0A4766AE16EA79A80028828B /* Supporting Files */,
 			);
@@ -139,16 +133,6 @@
 				0A750BE916ED5E43008256E7 /* ffmpeg */,
 			);
 			name = Binary;
-			sourceTree = "<group>";
-		};
-		0A750BF016ED8191008256E7 /* Preferences Window */ = {
-			isa = PBXGroup;
-			children = (
-				0A750BEB16ED8123008256E7 /* POPPreferencesWindowController.h */,
-				0A750BEC16ED8123008256E7 /* POPPreferencesWindowController.m */,
-				0A750BED16ED8124008256E7 /* POPPreferencesWindowController.xib */,
-			);
-			name = "Preferences Window";
 			sourceTree = "<group>";
 		};
 		0A750BF116ED81B5008256E7 /* Artwork */ = {
@@ -247,7 +231,6 @@
 				0AB919FD16EBB1D400119143 /* pause-128.png in Resources */,
 				0AB919FE16EBB1D400119143 /* play-128.png in Resources */,
 				0A750BEA16ED5E43008256E7 /* ffmpeg in Resources */,
-				0A750BEF16ED8124008256E7 /* POPPreferencesWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,7 +245,6 @@
 				0A4766BB16EA79A80028828B /* POPAppDelegate.m in Sources */,
 				0AB919F616EAF09A00119143 /* POPTimeConverter.m in Sources */,
 				0AB91A0516EBCFDF00119143 /* POPMp4Splitter.m in Sources */,
-				0A750BEE16ED8124008256E7 /* POPPreferencesWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

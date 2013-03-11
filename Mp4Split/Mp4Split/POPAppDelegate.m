@@ -290,6 +290,60 @@
 	}
 }
 
+- (IBAction)preferencesClick:(id)sender {
+	NSString* ffmpeg_path = [[NSUserDefaults standardUserDefaults] objectForKey:@"ffmpeg-path"];
+	if(ffmpeg_path == nil) ffmpeg_path = @"";
+	[[self preferencesFfmpegPathText] setStringValue:ffmpeg_path];
+	NSString* outFolder = [[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder"];
+	if(outFolder == nil) outFolder = @"";
+	if([outFolder compare:@""] == 0)
+	{
+		[[self preferencesOutputFolderMatrix] selectCellAtRow:0 column:0];
+	}
+	else{
+		[[self preferencesOutputFolderMatrix] selectCellAtRow:0 column:0];
+	}
+	[[self preferencesOutputFolderText] setStringValue:outFolder];
+	[NSApp beginSheet: [self prefsWindow] modalForWindow: [self window] modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+}
+
+- (IBAction)preferencesCloseButtonClick:(id)sender {
+	NSString* ffmpeg_path = [[self preferencesFfmpegPathText] stringValue];
+	if([ffmpeg_path compare:@""] != 0)
+	{
+		if(![[NSFileManager defaultManager] fileExistsAtPath:ffmpeg_path])
+		{
+			NSRunAlertPanel(@"ffmpeg path error.", [NSString stringWithFormat:@"ffmpeg path: %@ does not exist.", ffmpeg_path], @"OK", nil, nil);
+			return;
+		}
+	}
+	[[NSUserDefaults standardUserDefaults] setObject:ffmpeg_path forKey:@"ffmpeg-path"];
+	
+	NSInteger choice = [[self preferencesOutputFolderMatrix] selectedTag];
+	NSString* outFolder = [[self preferencesOutputFolderText] stringValue];
+	if(choice != 0)
+	{
+		BOOL isFolder;
+		if([[NSFileManager defaultManager]  fileExistsAtPath:outFolder isDirectory:&isFolder] == NO)
+		{
+			NSRunAlertPanel(@"Output folder error.", [NSString stringWithFormat:@"Output folder path: %@ does not exist.", outFolder], @"OK", nil, nil);
+			return;
+		}
+		else if(isFolder == NO)
+		{
+			NSRunAlertPanel(@"Output folder error.", [NSString stringWithFormat:@"Output folder path: %@ is not a folder.", outFolder], @"OK", nil, nil);
+			return;
+		}
+	}
+	else
+	{
+		outFolder = @"";
+	}
+	[[NSUserDefaults standardUserDefaults] setObject:outFolder forKey:@"output-folder"];
+	[NSApp endSheet:[self prefsWindow]];
+    [[self prefsWindow] orderOut:self];
+}
+
 - (int)numberOfRowsInTableView:(NSTableView *)tblView
 {
     if(tblView == [self splitsTableView])

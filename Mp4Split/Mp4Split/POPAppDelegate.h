@@ -25,6 +25,12 @@
 @property (assign) IBOutlet NSButton *playPauseButton;
 @property (assign) IBOutlet NSTableView *splitsTableView;
 @property (assign) IBOutlet NSTableView *segmentsTableView;
+
+@property (assign) IBOutlet NSWindow *prefsWindow;
+@property (assign) IBOutlet NSTextField *preferencesFfmpegPathText;
+@property (assign) IBOutlet NSMatrix *preferencesOutputFolderMatrix;
+@property (assign) IBOutlet NSTextField *preferencesOutputFolderText;
+
 - (IBAction)openMp4Click:(id)sender;
 - (IBAction)closeMp4Click:(id)sender;
 - (IBAction)playPauseClick:(id)sender;
@@ -33,6 +39,8 @@
 - (IBAction)addSplitClick:(id)sender;
 - (IBAction)removeSplitClick:(id)sender;
 - (IBAction)splitButtonClick:(id)sender;
+- (IBAction)preferencesClick:(id)sender;
+- (IBAction)preferencesCloseButtonClick:(id)sender;
 
 - (void) mp4SplitExit;
 - (void)mp4FileProgress:(float)percent;
