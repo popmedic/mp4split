@@ -116,7 +116,6 @@
 			[[self playPauseButton] setState:YES];
 			[[self mp4Slider] setFloatValue:[[[self mp4Player] movie] currentTime].timeValue];
 			[[self positionLabel] setStringValue:[POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime]]];
-			//NSLog(@"%@ tl/ts => %@", QTStringFromTime([[[self mp4Player] movie] currentTime]), [POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime]]);
 		}
 		oldSliderValue = [[[self mp4Player] movie] currentTime].timeValue;
 	}
@@ -150,23 +149,24 @@
 	{
 		source = [url copy];
 		[[self mp4Player] setMovie:nm];
-		[[self mp4Player] play:nm];
 		[[self mp4Slider] setMinValue:0.0];
 		[[self mp4Slider] setMaxValue:[nm duration].timeValue];
 		[[self mp4Slider] setFloatValue:0.0];
+		[[self volumeSlider] setFloatValue:[nm volume]];
 		[[self positionLabel] setStringValue:@"00:00:00.000"];
 		[self refreshButtons];
 		[self refreshTables];
 	}
 }
 - (IBAction)openMp4Click:(id)sender {
-	[self closeMp4];
+	
 	NSOpenPanel* oDlg = [NSOpenPanel openPanel];
-    [oDlg setCanChooseFiles:YES];
+	[oDlg setCanChooseFiles:YES];
     [oDlg setCanCreateDirectories:NO];
     [oDlg beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton)
         {
+			[self closeMp4];
             NSArray* urls = [oDlg URLs];
             NSURL *url = [urls objectAtIndex:0];
             [self openMp4:url];
@@ -201,6 +201,13 @@
 	}
 }
 
+- (IBAction)volumeSliderSeek:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		[[[self mp4Player] movie] setVolume:[[self volumeSlider] floatValue]];
+	}
+}
+
 - (IBAction)mp4SliderSeek:(id)sender {
 	if([[self mp4Player] movie] != nil)
 	{
@@ -228,23 +235,23 @@
 }
 
 - (void) mp4SplitExit{
-	[[self splitPrgressIndicator] setHidden:YES];
+	[[self taskProgressIndicator] setHidden:YES];
+	[[self fileProgressIndicator] setHidden:YES];
 	[[self splitButton] setImage:[NSImage imageNamed:@"mp4split-128.png"]];
 }
 - (void)mp4FileProgress:(float)percent
 {
-	
+	[[self fileProgressIndicator] setDoubleValue:percent];
 }
 - (void)mp4TaskProgress:(float)percent
 {
-	[[self splitPrgressIndicator] setDoubleValue:percent];
+	[[self taskProgressIndicator] setDoubleValue:percent];
 }
 - (IBAction)splitButtonClick:(id)sender {
 	if([@"mp4split-128" compare:[[[self splitButton] image] name]] == 0)
 	{
 		if([splits count] >= 2)
 		{
-			//NSMutableArray* cmds = [[NSMutableArray alloc] init];
 			NSMutableArray* tasks = [[NSMutableArray alloc] init];
 			for(int i = 0, ii = 1; i < [splits count]-1; i++, ii++)
 			{
@@ -258,25 +265,27 @@
 				for(;[[NSFileManager defaultManager] fileExistsAtPath:nfn];){
 					nfn = [NSString stringWithFormat:@"%@%i.%@", [srcpath stringByDeletingPathExtension], ++ii, [srcpath pathExtension]];
 				}
-				/*temp fix*/
+				/*temp fix
 				startstr = [POPTimeConverter timeStringFromSecs:((float)[POPTimeConverter secsFromTimeString:startstr] +
-							(float)(((float)[[[self mp4Player] movie] duration].timeScale)/1000.0))];
-				//NSString* cmd = [NSString stringWithFormat:@"ffmpeg -ss \"%@\" -t \"%@\" -i \"%@\" -acodec copy -vcodec copy \"%@\"", startstr, lengthstr ,srcpath , nfn];
-				//[cmds addObject:cmd];
-				/*end temp*/
+							(float)(((float)[[[self mp4Player] movie] duration].timeScale)/1000.0))];*/
+				
 				[tasks addObject:[POPMp4Splitter createTaskWithStart:startstr Length:lengthstr Source:srcpath Destination:nfn]];
 			}
-			/*temp
-			NSString* shscript = [[[source path] stringByDeletingPathExtension] stringByAppendingString:@"[split].sh"];
-			[[NSFileManager defaultManager] createFileAtPath:shscript contents:[[cmds componentsJoinedByString:@"\n"] dataUsingEncoding:1] attributes:nil];
-			end temp*/
 			if(splitter != nil) splitter = nil;
 			splitter = [[POPMp4Splitter alloc] initWithTasks:tasks];
 			[splitter setDelegate:self];
-			[[self splitPrgressIndicator] setDoubleValue:0.0];
-			[[self splitPrgressIndicator] setHidden:NO];
+			[[self taskProgressIndicator] setDoubleValue:0.0];
+			[[self taskProgressIndicator] setHidden:NO];
+			[[self fileProgressIndicator] setDoubleValue:0.0];
+			[[self fileProgressIndicator] setHidden:NO];
 			[[self splitButton] setImage:[NSImage imageNamed:@"mp4split-cancel-128.png"]];
 			[splitter launch];
+		}
+	}
+	else{
+		if(splitter != nil)
+		{
+			[splitter cancel];
 		}
 	}
 }
@@ -322,30 +331,11 @@ objectValueForTableColumn:(NSTableColumn*)tblCol
 		return @"";
 	}
 	return @"";
-	/*
-	NSString *sci = (NSString*)[aTableColumn identifier];
-    NSUInteger ci = (NSUInteger)[sci integerValue];
-    NSArray* row = [splitDS objectAtIndex:rowIndex];
-    return [row objectAtIndex:ci];*/
+	
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	[self refreshButtons];
 }
-/*
-- (void)tableView:(NSTableView*)tblView
-   setObjectValue:(id)obj
-   forTableColumn:(NSTableColumn *)tblColumn
-              row:(NSInteger)rowIndex
-{
-    NSString* v = (NSString*)obj;
-    if(v != nil)
-    {
-        NSString *sci = (NSString*)[aTableColumn identifier];
-        NSUInteger ci = (NSUInteger)[sci integerValue];
-        NSMutableArray* row = [splitDS objectAtIndex:rowIndex];
-        [row replaceObjectAtIndex:ci withObject:v];
-    }
-}*/
 @end

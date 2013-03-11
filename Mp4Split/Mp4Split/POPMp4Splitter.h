@@ -21,5 +21,5 @@
 -(id) initWithTasks:(NSArray*)tsks;
 -(void) setDelegate:(id)delegate;
 -(void) launch;
-
+-(void) cancel;
 @end
