@@ -54,7 +54,8 @@
 	
 	dst = [[dst stringByDeletingPathExtension] stringByAppendingString:@".mp4"];
 	/*-acodec libfaac -ac 2 -ab 128k -vcodec libx264 -threads 0*/
-	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src, @"-copyts", @"-vsync", @"passthrough",
+	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src,
+						@"-copyts", @"-vsync", @"passthrough",
 						@"-acodec", @"libfaac", @"-ac", @"2", @"-ab", @"128k",
 						@"-vcodec", @"libx264", @"-threads", @"0", dst,nil]];
 	return task;
