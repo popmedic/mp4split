@@ -17,16 +17,48 @@
 	id <POPMp4SplitterDelegate> _delegate;
 	bool splitting;
 }
-+(NSTask*) createTaskWithStart:(NSString*)ss Length:(NSString*)len Source:(NSString*)src Destination:(NSString*)dst{
+
++(NSTask*) createTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len{
 	
 	NSTask* task = [[NSTask alloc] init];
-	NSString* ffmpeg_path = [[NSBundle mainBundle] pathForResource:@"ffmpeg" ofType:nil];
+	
+	NSString* ffmpeg_path = [[NSUserDefaults standardUserDefaults] objectForKey:@"ffmpeg-path"];
+	if(ffmpeg_path == nil) ffmpeg_path = @"";
+	if([ffmpeg_path compare:@""] == 0)
+	{
+		ffmpeg_path = [[NSBundle mainBundle] pathForResource:@"ffmpeg" ofType:nil];
+	}
+	
 	[task setLaunchPath:ffmpeg_path];
 	[task setStandardOutput:[NSPipe pipe]];
 	[task setStandardError:[task standardOutput]];
 	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src,
 						@"-acodec", @"copy", @"-vcodec", @"copy", dst,nil]];
 	return task;
+}
+
++(BOOL) ffmpegIsWorking:(NSString*)ffmpeg_path
+{
+	NSTask* task = [[NSTask alloc] init];
+	
+	if(ffmpeg_path == nil) ffmpeg_path = @"";
+	if([ffmpeg_path compare:@""] == 0)
+	{
+		ffmpeg_path = [[NSBundle mainBundle] pathForResource:@"ffmpeg" ofType:nil];
+	}
+	
+	[task setLaunchPath:ffmpeg_path];
+	//[task setStandardOutput:[NSPipe pipe]];
+	//[task setStandardError:[task standardOutput]];
+	[task setArguments:[NSArray arrayWithObjects:@"-version", nil]];
+	[task launch];
+	[task waitUntilExit];
+	//NSLog(@"%i", [task terminationStatus]);
+	if([task terminationStatus] == 0)
+	{
+		return YES;
+	}
+	return NO;
 }
 
 -(id) initWithTasks:(NSArray*)tsks{
@@ -125,6 +157,7 @@
 					}
 				}
 			}
+			//NSLog(@"%@", datastr);
 		}
 		else {
 			[self taskExited];

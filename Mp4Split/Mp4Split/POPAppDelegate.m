@@ -261,15 +261,24 @@
 				NSString* lengthstr = [POPTimeConverter timeStringFromSecs:lengthsecs];
 				
 				NSString* srcpath = [source path];
-				NSString* nfn = [NSString stringWithFormat:@"%@%i.%@", [srcpath stringByDeletingPathExtension], ii, [srcpath pathExtension]];
+				NSString* outFolder = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder"];
+				NSString* choice = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder-choice"];
+				NSString* dstpath = [srcpath stringByDeletingPathExtension];
+				if(outFolder == nil) outFolder = @"";
+				if(choice == nil) choice = @"0";
+				if([choice compare:@"1"] == 0)
+				{
+					dstpath = [NSString stringWithFormat:@"%@/%@", outFolder, [dstpath lastPathComponent]];
+				}
+				NSString* nfn = [NSString stringWithFormat:@"%@%i.%@", dstpath, ii, [srcpath pathExtension]];
 				for(;[[NSFileManager defaultManager] fileExistsAtPath:nfn];){
-					nfn = [NSString stringWithFormat:@"%@%i.%@", [srcpath stringByDeletingPathExtension], ++ii, [srcpath pathExtension]];
+					nfn = [NSString stringWithFormat:@"%@%i.%@", dstpath, ++ii, [srcpath pathExtension]];
 				}
 				/*temp fix
 				startstr = [POPTimeConverter timeStringFromSecs:((float)[POPTimeConverter secsFromTimeString:startstr] +
 							(float)(((float)[[[self mp4Player] movie] duration].timeScale)/1000.0))];*/
 				
-				[tasks addObject:[POPMp4Splitter createTaskWithStart:startstr Length:lengthstr Source:srcpath Destination:nfn]];
+				[tasks addObject:[POPMp4Splitter createTaskWith:srcpath Destination:nfn Start:startstr Length:lengthstr]];
 			}
 			if(splitter != nil) splitter = nil;
 			splitter = [[POPMp4Splitter alloc] initWithTasks:tasks];
@@ -291,18 +300,21 @@
 }
 
 - (IBAction)preferencesClick:(id)sender {
-	NSString* ffmpeg_path = [[NSUserDefaults standardUserDefaults] objectForKey:@"ffmpeg-path"];
+	NSString* ffmpeg_path = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"ffmpeg-path"];
 	if(ffmpeg_path == nil) ffmpeg_path = @"";
 	[[self preferencesFfmpegPathText] setStringValue:ffmpeg_path];
-	NSString* outFolder = [[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder"];
-	if(outFolder == nil) outFolder = @"";
-	if([outFolder compare:@""] == 0)
+	NSString* choice = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder-choice"];
+	if(choice == nil) choice = @"0";
+	if([choice compare:@"0"] == 0)
 	{
 		[[self preferencesOutputFolderMatrix] selectCellAtRow:0 column:0];
 	}
-	else{
-		[[self preferencesOutputFolderMatrix] selectCellAtRow:0 column:0];
+	else
+	{
+		[[self preferencesOutputFolderMatrix] selectCellAtRow:1 column:0];
 	}
+	NSString* outFolder = [[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder"];
+	if(outFolder == nil) outFolder = @"";
 	[[self preferencesOutputFolderText] setStringValue:outFolder];
 	[NSApp beginSheet: [self prefsWindow] modalForWindow: [self window] modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
 }
@@ -316,6 +328,11 @@
 			NSRunAlertPanel(@"ffmpeg path error.", [NSString stringWithFormat:@"ffmpeg path: %@ does not exist.", ffmpeg_path], @"OK", nil, nil);
 			return;
 		}
+	}
+	if([POPMp4Splitter ffmpegIsWorking:ffmpeg_path] == NO)
+	{
+		NSRunAlertPanel(@"ffmpeg path error.", [NSString stringWithFormat:@"ffmpeg path: %@ returned a bad exit status for -version.", ffmpeg_path], @"OK", nil, nil);
+		return;
 	}
 	[[NSUserDefaults standardUserDefaults] setObject:ffmpeg_path forKey:@"ffmpeg-path"];
 	
@@ -339,6 +356,8 @@
 	{
 		outFolder = @"";
 	}
+	NSString* choiceStr = [NSString stringWithFormat:@"%li", choice];
+	[[NSUserDefaults standardUserDefaults] setObject:choiceStr forKey:@"output-folder-choice"];
 	[[NSUserDefaults standardUserDefaults] setObject:outFolder forKey:@"output-folder"];
 	[NSApp endSheet:[self prefsWindow]];
     [[self prefsWindow] orderOut:self];

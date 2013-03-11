@@ -16,7 +16,8 @@
 
 @interface POPMp4Splitter : NSObject
 
-+(NSTask*) createTaskWithStart:(NSString*)ss Length:(NSString*)len Source:(NSString*)src Destination:(NSString*)dst;
++(BOOL) ffmpegIsWorking:(NSString*)ffmpeg_path;
++(NSTask*) createTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len;
 
 -(id) initWithTasks:(NSArray*)tsks;
 -(void) setDelegate:(id)delegate;
