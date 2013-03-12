@@ -11,5 +11,7 @@
 @interface POPTimeConverter : NSObject
 + (NSString*) timeStringFromSecs:(float)secs;
 + (float) secsFromTimeString:(NSString*)str;
-+ (NSString*) timeStringFromQTTime:(QTTime)qtTime;
++ (QTTime) qttimeFromSecs:(float)secs Scale:(long)scale;
++ (float) secsFromQTTime:(QTTime)qtTime FrameRate:(double)fps;
++ (NSString*) timeStringFromQTTime:(QTTime)qtTime FrameRate:(double)fps;
 @end

@@ -9,13 +9,29 @@
 #import "POPTimeConverter.h"
 
 @implementation POPTimeConverter
-+ (NSString*) timeStringFromQTTime:(QTTime)qtTime
++ (NSString*) timeStringFromQTTime:(QTTime)qtTime FrameRate:(double)fps
 {
-	float secs = ((float)qtTime.timeValue/(float)qtTime.timeScale);
+	float secs = ((float)qtTime.timeValue/(float)qtTime.timeScale);///(float)fps;
+	/*float addsecs = 1.239 * (secs - [POPTimeConverter secsFromTimeString:[POPTimeConverter qttimeStringFromQTTime:qtTime]]);
+	secs = secs+addsecs;*/
 	return [POPTimeConverter timeStringFromSecs:secs];
-	/*NSString* rtn = QTStringFromTime(qtTime);
-	rtn = [[rtn substringFromIndex:[rtn rangeOfString:@":"].location+1] stringByDeletingLastPathComponent];
-	return rtn;*/
+	
+	/*return [POPTimeConverter qttimeStringFromQTTime];*/
+}
+
++ (float)secsFromQTTime:(QTTime)qtTime FrameRate:(double)fps
+{
+	return ((float)qtTime.timeValue/(float)qtTime.timeScale);
+}
+
++ (QTTime) qttimeFromSecs:(float)secs Scale:(long)scale{
+	return QTMakeTime((long)(long)(secs*(float)scale), scale);
+}
+
++ (NSString*) qttimeStringFromQTTime:(QTTime)qtTime
+{
+	NSString* timeStr = QTStringFromTime(qtTime);
+	return [[timeStr substringFromIndex:[timeStr rangeOfString:@":"].location+1] stringByDeletingLastPathComponent];
 }
 
 + (float) secsFromTimeString:(NSString*)str

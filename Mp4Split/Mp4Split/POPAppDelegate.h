@@ -37,6 +37,13 @@
 - (IBAction)playPauseClick:(id)sender;
 - (IBAction)volumeSliderSeek:(id)sender;
 - (IBAction)mp4SliderSeek:(id)sender;
+- (IBAction)playPauseMenuClick:(id)sender;
+- (IBAction)jumpToClick:(id)sender;
+- (IBAction)reversePlayClick:(id)sender;
+- (IBAction)speedUpClick:(id)sender;
+- (IBAction)slowDownClick:(id)sender;
+- (IBAction)nudgeFowardClick:(id)sender;
+- (IBAction)nudgeBackwardClick:(id)sender;
 - (IBAction)addSplitClick:(id)sender;
 - (IBAction)removeSplitClick:(id)sender;
 - (IBAction)splitButtonClick:(id)sender;

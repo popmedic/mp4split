@@ -16,6 +16,7 @@
 	long long oldSliderValue;
 	NSMutableArray* splits;
 	POPMp4Splitter* splitter;
+	double currentFrameRate;
 }
 - (void)dealloc
 {
@@ -103,6 +104,27 @@
 	[[self segmentsTableView] reloadData];
 }
 
+- (double)getMovieFrameRate
+{
+	double result = 0;
+	
+    for (QTTrack* track in [[[self mp4Player] movie] tracks])
+    {
+        QTMedia* trackMedia = [track media];
+		
+        if ([trackMedia hasCharacteristic:QTMediaCharacteristicHasVideoFrameRate])
+        {
+            QTTime mediaDuration = [(NSValue*)[trackMedia attributeForKey:QTMediaDurationAttribute] QTTimeValue];
+            long long mediaDurationScaleValue = mediaDuration.timeScale;
+            long mediaDurationTimeValue = mediaDuration.timeValue;
+            long mediaSampleCount = [(NSNumber*)[trackMedia attributeForKey:QTMediaSampleCountAttribute] longValue];
+            result = (double)mediaSampleCount * ((double)mediaDurationScaleValue / (double)mediaDurationTimeValue);
+            break;
+        }
+    }
+
+    return result;
+}
 - (void)refreshSlider:(NSTimer*)theTimer
 {
 	if([[self mp4Player] movie] != nil)
@@ -115,7 +137,7 @@
 		{
 			[[self playPauseButton] setState:YES];
 			[[self mp4Slider] setFloatValue:[[[self mp4Player] movie] currentTime].timeValue];
-			[[self positionLabel] setStringValue:[POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime]]];
+			[[self positionLabel] setStringValue:[POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate]];
 		}
 		oldSliderValue = [[[self mp4Player] movie] currentTime].timeValue;
 	}
@@ -129,7 +151,7 @@
 {
     
     [self stopSliderTimer];
-    sliderTimer = [NSTimer timerWithTimeInterval:0.1 target:self selector:@selector(refreshSlider:) userInfo:nil repeats:YES];
+    sliderTimer = [NSTimer timerWithTimeInterval:0.25 target:self selector:@selector(refreshSlider:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:sliderTimer forMode:NSDefaultRunLoopMode];
 }
 
@@ -156,6 +178,7 @@
 		[[self positionLabel] setStringValue:@"00:00:00.000"];
 		[self refreshButtons];
 		[self refreshTables];
+		currentFrameRate = [self getMovieFrameRate];
 	}
 }
 - (IBAction)openMp4Click:(id)sender {
@@ -216,8 +239,76 @@
 	}
 }
 
+- (IBAction)playPauseMenuClick:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		if([[self playPauseButton] state] == YES)
+		{
+			[[[self mp4Player] movie] stop];
+		}
+		else{
+			[[[self mp4Player] movie] play];
+		}
+	}
+}
+
+- (IBAction)jumpToClick:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		
+	}
+}
+
+- (IBAction)reversePlayClick:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		float r = [[[self mp4Player] movie] rate];
+		r = r*-1;
+		[[[self mp4Player] movie] setRate:r];
+	}
+}
+
+- (IBAction)speedUpClick:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		float r = [[[self mp4Player] movie] rate];
+		r = r*2;
+		[[[self mp4Player] movie] setRate:r];
+	}
+}
+
+- (IBAction)slowDownClick:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		float r = [[[self mp4Player] movie] rate];
+		if(r!=0)
+		{
+			r = r/2;
+		}
+		[[[self mp4Player] movie] setRate:r];
+	}
+}
+
+- (IBAction)nudgeFowardClick:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		float csecs = [POPTimeConverter secsFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
+		QTTime nqt = [POPTimeConverter qttimeFromSecs:csecs+1.0 Scale:[[[self mp4Player] movie] currentTime].timeScale];
+		[[[self mp4Player] movie] setCurrentTime:nqt];
+	}
+}
+
+- (IBAction)nudgeBackwardClick:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		float csecs = [POPTimeConverter secsFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
+		QTTime nqt = [POPTimeConverter qttimeFromSecs:csecs-1.0 Scale:[[[self mp4Player] movie] currentTime].timeScale];
+		[[[self mp4Player] movie] setCurrentTime:nqt];
+	}
+}
+
 - (IBAction)addSplitClick:(id)sender {
-	[splits addObject:[POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime]]];
+	[splits addObject:[POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate]];
 	[splits sortUsingComparator:^(id s1, id s2){
 		return [(NSString*)s1 compare:(NSString*)s2];
 	}];
