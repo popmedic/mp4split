@@ -9,11 +9,18 @@
 #import <Cocoa/Cocoa.h>
 #import <QTKit/QTKit.h>
 
+@interface QTMovie(IdlingAdditions)
+-(QTTime)maxTimeLoaded;
+@end
+
 @interface POPAppDelegate : NSObject <NSApplicationDelegate>
 
 @property (assign) IBOutlet NSWindow *window;
+@property (assign) IBOutlet NSMenuItem *controlMenu;
+@property (assign) IBOutlet NSMenu *chaptersMenu;
 @property (assign) IBOutlet NSSplitView *mainVerticalSplitView;
 @property (assign) IBOutlet QTMovieView *mp4Player;
+@property (assign) IBOutlet NSProgressIndicator *mp4LoadingProgressIndicator;
 @property (assign) IBOutlet NSSlider *volumeSlider;
 @property (assign) IBOutlet NSSlider *mp4Slider;
 @property (assign) IBOutlet NSTextField *positionLabel;

@@ -17,6 +17,8 @@
 	NSMutableArray* splits;
 	POPMp4Splitter* splitter;
 	double currentFrameRate;
+	NSArray* currentChapters;
+	BOOL mp4Loading;
 }
 - (void)dealloc
 {
@@ -41,6 +43,7 @@
 	// Insert code here to initialize your application
 	splitter = nil;
 	sliderTimer = nil;
+	mp4Loading = NO;
 	oldSliderValue = 0.0;
 	splits = [[NSMutableArray alloc] init];
 	[[self mp4Player] setMovie:nil];
@@ -68,6 +71,7 @@
 	BOOL sbe = YES;
 	BOOL asbe = YES;
 	BOOL rsbe = YES;
+	BOOL cme = YES;
 	if([[self mp4Player] movie] == nil)
 	{
 		ppbe = NO;
@@ -75,6 +79,7 @@
 		sbe = NO;
 		asbe = NO;
 		rsbe = NO;
+		cme = NO;
 	}
 	else if([splits count] < 2)
 	{
@@ -88,6 +93,7 @@
 	[[self mp4Slider] setEnabled:mse];
 	[[self addSplitButton] setEnabled:asbe];
 	[[self removeSplitButton] setEnabled:rsbe];
+	[[self controlMenu] setEnabled:cme];
 	if(sbe == YES)
 	{
 		[[self splitButton] setAction:@selector(splitButtonClick:)];
@@ -104,20 +110,20 @@
 	[[self segmentsTableView] reloadData];
 }
 
-- (double)getMovieFrameRate
+- (double)getMovieFrameRate:(QTMovie*)movie
 {
 	double result = 0;
 	
-    for (QTTrack* track in [[[self mp4Player] movie] tracks])
+    for (QTTrack* track in [movie tracks])
     {
-        QTMedia* trackMedia = [track media];
+        QTMedia* media = [track media];
 		
-        if ([trackMedia hasCharacteristic:QTMediaCharacteristicHasVideoFrameRate])
+        if ([media hasCharacteristic:QTMediaCharacteristicHasVideoFrameRate])
         {
-            QTTime mediaDuration = [(NSValue*)[trackMedia attributeForKey:QTMediaDurationAttribute] QTTimeValue];
+            QTTime mediaDuration = [(NSValue*)[media attributeForKey:QTMediaDurationAttribute] QTTimeValue];
             long long mediaDurationScaleValue = mediaDuration.timeScale;
             long mediaDurationTimeValue = mediaDuration.timeValue;
-            long mediaSampleCount = [(NSNumber*)[trackMedia attributeForKey:QTMediaSampleCountAttribute] longValue];
+            long mediaSampleCount = [(NSNumber*)[media attributeForKey:QTMediaSampleCountAttribute] longValue];
             result = (double)mediaSampleCount * ((double)mediaDurationScaleValue / (double)mediaDurationTimeValue);
             break;
         }
@@ -125,10 +131,78 @@
 
     return result;
 }
+
+- (void)removeSubtitleTracks:(QTMovie*) movie
+{
+	for (QTTrack* track in [movie tracks])
+    {
+		NSString* mt = [[track trackAttributes] objectForKey:QTTrackMediaTypeAttribute];
+		NSNumber* layer = [[track trackAttributes] objectForKey:QTTrackLayerAttribute];
+		if([mt compare:@"vide"] == 0 && [layer shortValue] == -1)
+		{
+			[track setEnabled:NO];
+			//DisposeMovieTrack([track quickTimeTrack]);
+		}
+    }
+}
+
+- (IBAction)chapterMenuItemClick:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		currentChapters = [[[self mp4Player] movie] chapters];
+		NSDictionary* chapter = [currentChapters objectAtIndex:[sender tag]];
+		QTTime qttime;
+		[[chapter objectForKey:QTMovieChapterStartTime] getValue:&qttime];
+		[[[self mp4Player] movie] setCurrentTime:qttime];
+	}
+}
+- (void)unloadMovieChapters
+{
+	while([[[self chaptersMenu] itemArray] count] > 0)
+	{
+		[[self chaptersMenu] removeItemAtIndex:0];
+	}
+}
+- (void)loadMovieChapters:(QTMovie*)movie
+{
+	if(movie != nil)
+	{
+		if([movie chapterCount] > 0)
+		{
+			currentChapters = [[[self mp4Player] movie] chapters];
+			
+			for(int i = 0; i < [currentChapters count]; i++) {
+				NSDictionary* chapter = [currentChapters objectAtIndex:i];
+				NSString* name = [chapter objectForKey:QTMovieChapterName];
+				QTTime qttime;
+				[[chapter objectForKey:QTMovieChapterStartTime] getValue:&qttime];
+				NSString* time = [POPTimeConverter timeStringFromQTTime:qttime FrameRate:currentFrameRate];
+				NSString* title = [NSString stringWithFormat:@"%@ : %@", name, time];
+				NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chapterMenuItemClick:) keyEquivalent:@""];
+				[item setTag:i];
+				[[self chaptersMenu] addItem:item];
+			}
+		}
+	}
+}
+
 - (void)refreshSlider:(NSTimer*)theTimer
 {
 	if([[self mp4Player] movie] != nil)
 	{
+		if(mp4Loading == YES)
+		{
+			float dur = [[[self mp4Player] movie] duration].timeValue;
+			float max = [[[self mp4Player] movie] maxTimeLoaded].timeValue;
+			double res = max/dur;
+			[[self mp4LoadingProgressIndicator] setDoubleValue:res*100];
+			if(res == 1)
+			{
+				[[self mp4LoadingProgressIndicator] setHidden:YES];
+				mp4Loading = NO;
+			}
+			
+		}
 		if(oldSliderValue == [[[self mp4Player] movie] currentTime].timeValue)
 		{
 			[[self playPauseButton] setState:NO];
@@ -170,15 +244,20 @@
 	if(nm)
 	{
 		source = [url copy];
-		[[self mp4Player] setMovie:nm];
 		[[self mp4Slider] setMinValue:0.0];
 		[[self mp4Slider] setMaxValue:[nm duration].timeValue];
 		[[self mp4Slider] setFloatValue:0.0];
+		[[self mp4LoadingProgressIndicator] setDoubleValue:0];
 		[[self volumeSlider] setFloatValue:[nm volume]];
 		[[self positionLabel] setStringValue:@"00:00:00.000"];
+		currentFrameRate = [self getMovieFrameRate:nm];
+		[self loadMovieChapters:nm];
+		[self removeSubtitleTracks:nm];
+		[[self mp4Player] setMovie:nm];
+		[[self mp4LoadingProgressIndicator] setHidden:NO];
+		mp4Loading = YES;
 		[self refreshButtons];
 		[self refreshTables];
-		currentFrameRate = [self getMovieFrameRate];
 	}
 }
 - (IBAction)openMp4Click:(id)sender {
@@ -203,6 +282,7 @@
 		[[[self mp4Player] movie] stop];
 		[[self mp4Player] setMovie:nil];
 		[splits removeAllObjects];
+		[self unloadMovieChapters];
 		[self refreshButtons];
 		[self refreshTables];
 	}
@@ -459,7 +539,7 @@
 	
 	if([outFileTemplate compare:@""] == 0)
 	{
-		outFileTemplate = @"{SRC}-{IDX}";
+		outFileTemplate = @"{SRC}{IDX}";
 	}
 	
 	[[NSUserDefaults standardUserDefaults] setObject:ffmpeg_path forKey:@"ffmpeg-path"];
