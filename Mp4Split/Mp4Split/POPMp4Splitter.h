@@ -24,4 +24,11 @@
 -(void) setDelegate:(id)delegate;
 -(void) launch;
 -(void) cancel;
+
+-(BOOL) isSplitting;
+
+-(NSString*) taskSourcePathAt:(NSInteger)idx;
+-(NSString*) taskDestinationPathAt:(NSInteger)idx;
+-(NSString*) taskStartTimeStringAt:(NSInteger)idx;
+-(NSString*) taskLengthTimeStringAt:(NSInteger)idx;
 @end

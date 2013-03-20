@@ -8,14 +8,20 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QTKit/QTKit.h>
+#import "POPMp4Splitter.h"
+#import "POPTimeConverter.h"
 
 @interface QTMovie(IdlingAdditions)
 -(QTTime)maxTimeLoaded;
 @end
 
-@interface POPAppDelegate : NSObject <NSApplicationDelegate>
+@interface POPMainWindow : NSWindow
+- (BOOL)windowShouldClose:(id)sender;
+@end
 
-@property (assign) IBOutlet NSWindow *window;
+@interface POPAppDelegate : NSObject <NSApplicationDelegate>
+@property (readonly) POPMp4Splitter *splitter;
+@property (assign) IBOutlet POPMainWindow *window;
 @property (assign) IBOutlet NSMenuItem *controlMenu;
 @property (assign) IBOutlet NSMenu *chaptersMenu;
 @property (assign) IBOutlet NSSplitView *mainVerticalSplitView;
@@ -37,7 +43,11 @@
 @property (assign) IBOutlet NSTextField *preferencesFfmpegPathText;
 @property (assign) IBOutlet NSMatrix *preferencesOutputFolderMatrix;
 @property (assign) IBOutlet NSTextField *preferencesOutputFolderText;
-@property (assign) IBOutlet NSTextField *preferencesOutputFileTemplateText;
+@property (assign) IBOutlet NSButton *preferencesUsePassthroughCheckBox;
+
+@property (assign) IBOutlet NSWindow *outputFilenameWindow;
+@property (assign) IBOutlet NSTextField *outputFilenameText;
+@property (assign) IBOutlet NSTextField *outputFilenameAddToIndexText;
 
 - (IBAction)openMp4Click:(id)sender;
 - (IBAction)closeMp4Click:(id)sender;
@@ -45,17 +55,22 @@
 - (IBAction)volumeSliderSeek:(id)sender;
 - (IBAction)mp4SliderSeek:(id)sender;
 - (IBAction)playPauseMenuClick:(id)sender;
-- (IBAction)jumpToClick:(id)sender;
 - (IBAction)reversePlayClick:(id)sender;
 - (IBAction)speedUpClick:(id)sender;
 - (IBAction)slowDownClick:(id)sender;
-- (IBAction)nudgeFowardClick:(id)sender;
-- (IBAction)nudgeBackwardClick:(id)sender;
+- (IBAction)nudgeForwardClickx1:(id)sender;
+- (IBAction)nudgeForwardx10Click:(id)sender;
+- (IBAction)nudgeBackwardx1Click:(id)sender;
+- (IBAction)nudgeBackwardx10Click:(id)sender;
 - (IBAction)addSplitClick:(id)sender;
 - (IBAction)removeSplitClick:(id)sender;
 - (IBAction)splitButtonClick:(id)sender;
+
 - (IBAction)preferencesClick:(id)sender;
 - (IBAction)preferencesCloseButtonClick:(id)sender;
+
+- (IBAction)outputFilenameOkButtonClick:(id)sender;
+- (IBAction)outputFilenameCancelButtonClick:(id)sender;
 
 - (void) mp4SplitExit;
 - (void)mp4FileProgress:(float)percent;

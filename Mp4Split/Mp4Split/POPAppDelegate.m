@@ -5,9 +5,30 @@
 //  Created by Kevin Scardina on 3/8/13.
 //  Copyright (c) 2013 Kevin Scardina. All rights reserved.
 //
-#import "POPTimeConverter.h"
 #import "POPAppDelegate.h"
-#import "POPMp4Splitter.h"
+
+@implementation POPMainWindow
+- (BOOL)windowShouldClose:(id)sender
+{
+	POPMp4Splitter* splitter = [(POPAppDelegate*)[NSApp delegate] splitter];
+	if(splitter != nil)
+	{
+		if([splitter isSplitting])
+		{
+			if(NSRunAlertPanel(@"Currently splitting!!!", @"You are currently splitting are you sure you want to quit?", @"Cancel", @"Quit", nil) == NSAlertDefaultReturn)
+			{
+				return false;
+			}
+			else
+			{
+				[splitter cancel];
+				return true;
+			}
+		}
+	}
+	return true;
+}
+@end
 
 @implementation POPAppDelegate
 {
@@ -15,33 +36,42 @@
 	NSTimer* sliderTimer;
 	long long oldSliderValue;
 	NSMutableArray* splits;
-	POPMp4Splitter* splitter;
 	double currentFrameRate;
 	NSArray* currentChapters;
 	BOOL mp4Loading;
+	POPMp4Splitter* _splitter;
+	NSString* outputPrefix;
+	NSInteger outputAddToIndex;
 }
 - (void)dealloc
 {
     [super dealloc];
 }
 
-- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender
-{
+-(NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{	
 	CGFloat f = [[[[self mainVerticalSplitView] subviews] objectAtIndex:0] frame].size.width;
 	[[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithFloat:f] forKey:@"vsplit1"];
 	f = [[[[self mainVerticalSplitView] subviews] objectAtIndex:1] frame].size.width;
 	[[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithFloat:f] forKey:@"vsplit2"];
+	
 	[self stopSliderTimer];
 	sliderTimer = nil;
-	splitter = nil;
+	_splitter = nil;
 	splits = nil;
+	
+	return NSTerminateNow;
+}
+
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender
+{
 	return YES;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	// Insert code here to initialize your application
-	splitter = nil;
+	_splitter = nil;
 	sliderTimer = nil;
 	mp4Loading = NO;
 	oldSliderValue = 0.0;
@@ -169,7 +199,7 @@
 	{
 		if([movie chapterCount] > 0)
 		{
-			currentChapters = [[[self mp4Player] movie] chapters];
+			currentChapters = [movie chapters];
 			
 			for(int i = 0; i < [currentChapters count]; i++) {
 				NSDictionary* chapter = [currentChapters objectAtIndex:i];
@@ -332,13 +362,6 @@
 	}
 }
 
-- (IBAction)jumpToClick:(id)sender {
-	if([[self mp4Player] movie] != nil)
-	{
-		
-	}
-}
-
 - (IBAction)reversePlayClick:(id)sender {
 	if([[self mp4Player] movie] != nil)
 	{
@@ -369,7 +392,7 @@
 	}
 }
 
-- (IBAction)nudgeFowardClick:(id)sender {
+- (IBAction)nudgeForwardClickx1:(id)sender {
 	if([[self mp4Player] movie] != nil)
 	{
 		float csecs = [POPTimeConverter secsFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
@@ -378,11 +401,29 @@
 	}
 }
 
-- (IBAction)nudgeBackwardClick:(id)sender {
+- (IBAction)nudgeForwardx10Click:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		float csecs = [POPTimeConverter secsFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
+		QTTime nqt = [POPTimeConverter qttimeFromSecs:csecs+10.0 Scale:[[[self mp4Player] movie] currentTime].timeScale];
+		[[[self mp4Player] movie] setCurrentTime:nqt];
+	}
+}
+
+- (IBAction)nudgeBackwardx1Click:(id)sender {
 	if([[self mp4Player] movie] != nil)
 	{
 		float csecs = [POPTimeConverter secsFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
 		QTTime nqt = [POPTimeConverter qttimeFromSecs:csecs-1.0 Scale:[[[self mp4Player] movie] currentTime].timeScale];
+		[[[self mp4Player] movie] setCurrentTime:nqt];
+	}
+}
+
+- (IBAction)nudgeBackwardx10Click:(id)sender {
+	if([[self mp4Player] movie] != nil)
+	{
+		float csecs = [POPTimeConverter secsFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
+		QTTime nqt = [POPTimeConverter qttimeFromSecs:csecs-10.0 Scale:[[[self mp4Player] movie] currentTime].timeScale];
 		[[[self mp4Player] movie] setCurrentTime:nqt];
 	}
 }
@@ -418,57 +459,70 @@
 {
 	[[self taskProgressIndicator] setDoubleValue:percent];
 }
+- (void)outputFilenameSheetDidEnd:(NSWindow *)sheet returnCode:(NSUInteger)returnCode contextInfo:(void *)contextInfo {
+    [sheet orderOut:self];
+    
+    if (returnCode == 0)
+	{
+		 NSMutableArray* tasks = [[NSMutableArray alloc] init];
+		 for(int i = 0; i < [splits count]-1; i++)
+		 {
+			 NSString* startstr = splits[i];
+			 float startsecs = [POPTimeConverter secsFromTimeString:startstr];
+			 float lengthsecs = [POPTimeConverter secsFromTimeString:splits[i+1]] - startsecs;
+			 NSString* lengthstr = [POPTimeConverter timeStringFromSecs:lengthsecs];
+			 
+			 NSString* srcpath = [source path];
+			 NSString* outFolder = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder"];
+			 NSString* choice = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder-choice"];
+			 NSString* dstpath = [srcpath stringByDeletingLastPathComponent];
+			 if(outFolder == nil) outFolder = dstpath;
+			 if(choice == nil) choice = @"0";
+			 if([choice compare:@"1"] == 0)
+			 {
+				 dstpath = outFolder;
+			 }
+			 
+			 NSString* nfn = [NSString stringWithFormat:@"%@/%@%i.%@", dstpath, outputPrefix, (i+1)+(int)outputAddToIndex, @"mp4"];
+			 for(int ii = 1;[[NSFileManager defaultManager] fileExistsAtPath:nfn];ii++)
+			 {
+				 nfn = [NSString stringWithFormat:@"%@/%@%i(%i).%@", dstpath, outputPrefix, (i+1)+(int)outputAddToIndex, ii, @"mp4"];
+			 }
+			 
+			 if([[srcpath pathExtension] compare:@"mp4" options:NSCaseInsensitiveSearch] == 0)
+			 {
+				 [tasks addObject:[POPMp4Splitter createTaskWith:srcpath Destination:nfn Start:startstr Length:lengthstr]];
+			 }
+			 else
+			 {
+				 [tasks addObject:[POPMp4Splitter createConvertTaskWith:srcpath Destination:nfn Start:startstr Length:lengthstr]];
+			 }
+		 }
+		 if(_splitter != nil) _splitter = nil;
+		 _splitter = [[POPMp4Splitter alloc] initWithTasks:tasks];
+		 [_splitter setDelegate:self];
+		 [[self taskProgressIndicator] setDoubleValue:0.0];
+		 [[self taskProgressIndicator] setHidden:NO];
+		 [[self fileProgressIndicator] setDoubleValue:0.0];
+		 [[self fileProgressIndicator] setHidden:NO];
+		 [[self splitButton] setImage:[NSImage imageNamed:@"mp4split-cancel-128.png"]];
+		 [_splitter launch];
+	}
+}
 - (IBAction)splitButtonClick:(id)sender {
 	if([@"mp4split-128" compare:[[[self splitButton] image] name]] == 0)
 	{
 		if([splits count] >= 2)
 		{
-			NSMutableArray* tasks = [[NSMutableArray alloc] init];
-			for(int i = 0, ii = 1; i < [splits count]-1; i++, ii++)
-			{
-				NSString* startstr = splits[i];
-				float startsecs = [POPTimeConverter secsFromTimeString:startstr];
-				float lengthsecs = [POPTimeConverter secsFromTimeString:splits[i+1]] - startsecs;
-				NSString* lengthstr = [POPTimeConverter timeStringFromSecs:lengthsecs];
-				
-				NSString* srcpath = [source path];
-				NSString* outFolder = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder"];
-				NSString* choice = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"output-folder-choice"];
-				NSString* dstpath = [srcpath stringByDeletingPathExtension];
-				if(outFolder == nil) outFolder = @"";
-				if(choice == nil) choice = @"0";
-				if([choice compare:@"1"] == 0)
-				{
-					dstpath = [NSString stringWithFormat:@"%@/%@", outFolder, [dstpath lastPathComponent]];
-				}
-				NSString* nfn = [NSString stringWithFormat:@"%@%i.%@", dstpath, ii, @"mp4"/*[srcpath pathExtension]*/];
-				for(;[[NSFileManager defaultManager] fileExistsAtPath:nfn];){
-					nfn = [NSString stringWithFormat:@"%@%i.%@", dstpath, ++ii, @"mp4"/*[srcpath pathExtension]*/];
-				}
-				if([[srcpath pathExtension] compare:@"mp4" options:NSCaseInsensitiveSearch] == 0)
-				{
-					[tasks addObject:[POPMp4Splitter createTaskWith:srcpath Destination:nfn Start:startstr Length:lengthstr]];
-				}
-				else
-				{
-					[tasks addObject:[POPMp4Splitter createConvertTaskWith:srcpath Destination:nfn Start:startstr Length:lengthstr]];
-				}
-			}
-			if(splitter != nil) splitter = nil;
-			splitter = [[POPMp4Splitter alloc] initWithTasks:tasks];
-			[splitter setDelegate:self];
-			[[self taskProgressIndicator] setDoubleValue:0.0];
-			[[self taskProgressIndicator] setHidden:NO];
-			[[self fileProgressIndicator] setDoubleValue:0.0];
-			[[self fileProgressIndicator] setHidden:NO];
-			[[self splitButton] setImage:[NSImage imageNamed:@"mp4split-cancel-128.png"]];
-			[splitter launch];
+			[[self outputFilenameText] setStringValue:[[[source path] lastPathComponent] stringByDeletingPathExtension]];
+			[[self outputFilenameAddToIndexText] setStringValue:@"0"];
+			[NSApp beginSheet:[self outputFilenameWindow] modalForWindow:[self window] modalDelegate:self didEndSelector:@selector(outputFilenameSheetDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 		}
 	}
 	else{
-		if(splitter != nil)
+		if(_splitter != nil)
 		{
-			[splitter cancel];
+			[_splitter cancel];
 		}
 	}
 }
@@ -493,9 +547,8 @@
 	if(outFolder == nil) outFolder = @"";
 	[[self preferencesOutputFolderText] setStringValue:outFolder];
 	
-	NSString *outFileTemplate = [[NSUserDefaults standardUserDefaults] objectForKey:@"output-file-template"];
-	if(outFileTemplate == nil) outFileTemplate = @"";
-	[[self preferencesOutputFileTemplateText] setStringValue:outFileTemplate];
+	NSNumber* usePassthrough = [[NSUserDefaults standardUserDefaults] objectForKey:@"use-passthrough"];
+	[[self preferencesUsePassthroughCheckBox] setState:[usePassthrough integerValue]];
 	
 	[NSApp beginSheet: [self prefsWindow] modalForWindow: [self window] modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
 }
@@ -504,7 +557,6 @@
 	NSString* ffmpeg_path = [[self preferencesFfmpegPathText] stringValue];
 	NSInteger choice = [[self preferencesOutputFolderMatrix] selectedTag];
 	NSString* outFolder = [[[self preferencesOutputFolderText] stringValue] stringByStandardizingPath];
-	NSString* outFileTemplate = [[self preferencesOutputFileTemplateText] stringValue];
 	
 	if([ffmpeg_path compare:@""] != 0)
 	{
@@ -537,18 +589,25 @@
 	}
 	NSString* choiceStr = [NSString stringWithFormat:@"%li", choice];
 	
-	if([outFileTemplate compare:@""] == 0)
-	{
-		outFileTemplate = @"{SRC}{IDX}";
-	}
+	NSNumber* usePassthrough = [NSNumber numberWithInteger:[[self preferencesUsePassthroughCheckBox] state]];
 	
 	[[NSUserDefaults standardUserDefaults] setObject:ffmpeg_path forKey:@"ffmpeg-path"];
 	[[NSUserDefaults standardUserDefaults] setObject:choiceStr forKey:@"output-folder-choice"];
 	[[NSUserDefaults standardUserDefaults] setObject:outFolder forKey:@"output-folder"];
-	[[NSUserDefaults standardUserDefaults] setObject:outFileTemplate forKey:@"output-file-template"];
+	[[NSUserDefaults standardUserDefaults] setObject:usePassthrough forKey:@"use=passthrough"];
 	
 	[NSApp endSheet:[self prefsWindow]];
     [[self prefsWindow] orderOut:self];
+}
+
+- (IBAction)outputFilenameOkButtonClick:(id)sender {
+	outputPrefix = [NSString stringWithString:[[self outputFilenameText] stringValue]];
+	outputAddToIndex = [[[self outputFilenameAddToIndexText] stringValue] integerValue];
+	[NSApp endSheet:[self outputFilenameWindow] returnCode:0];
+}
+
+- (IBAction)outputFilenameCancelButtonClick:(id)sender {
+	[NSApp endSheet:[self outputFilenameWindow] returnCode:1];
 }
 
 - (int)numberOfRowsInTableView:(NSTableView *)tblView

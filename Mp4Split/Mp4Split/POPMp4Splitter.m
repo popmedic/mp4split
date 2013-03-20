@@ -18,7 +18,8 @@
 	bool splitting;
 }
 
-+(NSTask*) createTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len{
++(NSTask*) createTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len
+{
 	
 	NSTask* task = [[NSTask alloc] init];
 	
@@ -37,7 +38,8 @@
 	return task;
 }
 
-+(NSTask*) createConvertTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len{
++(NSTask*) createConvertTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len
+{
 	
 	NSTask* task = [[NSTask alloc] init];
 	
@@ -53,11 +55,22 @@
 	[task setStandardError:[task standardOutput]];
 	
 	dst = [[dst stringByDeletingPathExtension] stringByAppendingString:@".mp4"];
-	/*-acodec libfaac -ac 2 -ab 128k -vcodec libx264 -threads 0*/
-	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src,
-						@"-copyts", @"-vsync", @"passthrough",
-						@"-acodec", @"libfaac", @"-ac", @"2", @"-ab", @"128k",
-						@"-vcodec", @"libx264", @"-threads", @"0", dst,nil]];
+	NSNumber* usePassthroughNumber = [[NSUserDefaults standardUserDefaults] objectForKey:@"use-passthrough"];
+	BOOL usePassthrough = false;
+	if(usePassthroughNumber != nil) usePassthrough = [usePassthroughNumber boolValue];
+	if(usePassthrough)
+	{
+		[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src,
+							@"-copyts", @"-vsync", @"passthrough",
+							@"-acodec", @"libfaac", @"-ac", @"2", @"-ab", @"128k",
+							@"-vcodec", @"libx264", @"-threads", @"0", dst,nil]];
+	}
+	else
+	{
+		[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src, @"-copyts",
+							@"-acodec", @"libfaac", @"-ac", @"2", @"-ab", @"128k",
+							@"-vcodec", @"libx264", @"-threads", @"0", dst,nil]];
+	}
 	return task;
 }
 
@@ -85,7 +98,8 @@
 	return NO;
 }
 
--(id) initWithTasks:(NSArray*)tsks{
+-(id) initWithTasks:(NSArray*)tsks
+{
 	_delegate = nil;
 	tasks = [[NSMutableArray alloc]init];
 	for(int i = 0; i < [tsks count]; i++)
@@ -98,8 +112,51 @@
 	return self;
 }
 
--(void) setDelegate:(id)delegate{
+-(void) setDelegate:(id)delegate
+{
 	_delegate = delegate;
+}
+
+-(NSString*) taskSourcePathAt:(NSInteger)idx
+{
+	if(idx < [tasks count])
+	{
+		return [[[tasks objectAtIndex:idx] arguments] objectAtIndex:5];
+	}
+	return @"";
+}
+
+-(NSString*) taskDestinationPathAt:(NSInteger)idx
+{
+	if(idx < [tasks count])
+	{
+		NSArray * args = [[tasks objectAtIndex:idx] arguments];
+		return [args objectAtIndex:[args count]-1];
+	}
+	return @"";
+}
+
+-(NSString*) taskStartTimeStringAt:(NSInteger)idx
+{
+	if(idx < [tasks count])
+	{
+		return [[[tasks objectAtIndex:idx] arguments] objectAtIndex:1];
+	}
+	return @"";
+}
+
+-(NSString*) taskLengthTimeStringAt:(NSInteger)idx
+{
+	if(idx < [tasks count])
+	{
+		return [[[tasks objectAtIndex:idx] arguments] objectAtIndex:3];
+	}
+	return @"";
+}
+
+-(BOOL) isSplitting
+{
+	return splitting;
 }
 
 - (void)taskExited
@@ -184,8 +241,10 @@
 					}
 				}
 			}
-			@catch (NSException *e) {
-				//do nothing...
+			@catch (NSException *e)
+			{
+				NSLog(@"Exception: %@", [e description]);
+				NSLog(@"Carry on my son...");
 			}
 			//NSLog(@"%@", datastr);
 		}
@@ -213,13 +272,15 @@
     [task launch];
 }
 
--(void) launch{
+-(void) launch
+{
 	splitting = true;
 	currentTaskIdx = 0;
 	[self runCurrentTask];
 }
 
--(void) cancel{
+-(void) cancel
+{
 	splitting = false;
 }
 
