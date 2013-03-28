@@ -199,6 +199,7 @@
     }
     else
     {
+		splitting =  NO;
         if(_delegate != nil)
 		{
 			[_delegate mp4SplitExit];

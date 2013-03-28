@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Kevin Scardina. All rights reserved.
 //
 #import "POPAppDelegate.h"
+#import "POPmp4v2dylibloader.h"
 
 @implementation POPMainWindow
 - (BOOL)windowShouldClose:(id)sender
@@ -179,10 +180,13 @@
 - (IBAction)chapterMenuItemClick:(id)sender {
 	if([[self mp4Player] movie] != nil)
 	{
-		currentChapters = [[[self mp4Player] movie] chapters];
+		/*currentChapters = [[[self mp4Player] movie] chapters];
 		NSDictionary* chapter = [currentChapters objectAtIndex:[sender tag]];
 		QTTime qttime;
 		[[chapter objectForKey:QTMovieChapterStartTime] getValue:&qttime];
+		[[[self mp4Player] movie] setCurrentTime:qttime];*/
+		NSArray* a = [[sender title] componentsSeparatedByString:@" - "];
+		QTTime qttime = [POPTimeConverter qttimeFromSecs:[POPTimeConverter secsFromTimeString:[a objectAtIndex:1]] Scale:[[[self mp4Player] movie] currentTime].timeScale];
 		[[[self mp4Player] movie] setCurrentTime:qttime];
 	}
 }
@@ -207,10 +211,34 @@
 				QTTime qttime;
 				[[chapter objectForKey:QTMovieChapterStartTime] getValue:&qttime];
 				NSString* time = [POPTimeConverter timeStringFromQTTime:qttime FrameRate:currentFrameRate];
-				NSString* title = [NSString stringWithFormat:@"%@ : %@", name, time];
+				NSString* title = [NSString stringWithFormat:@"%@ - %@", name, time];
 				NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chapterMenuItemClick:) keyEquivalent:@""];
 				[item setTag:i];
 				[[self chaptersMenu] addItem:item];
+			}
+		}
+		else
+		{
+			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2.dylib" ofType:@"dylib"]];
+			MP4FileHandle mp4file = _MP4Modify([[source path] cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
+			unsigned int chapCnt;
+			MP4Chapter_t *gchaps;
+			_MP4GetChapters(mp4file, &gchaps, &chapCnt, MP4ChapterTypeNero);
+			_MP4Close(mp4file, 0);
+			if(gchaps != NULL)
+			{
+				MP4Duration st = 0.0;
+				for(int i = 0; i < chapCnt; i++)
+				{
+					NSString* name = [NSString stringWithCString:gchaps[i].title encoding:NSStringEncodingConversionAllowLossy];
+					NSString* time = [POPTimeConverter timeStringFromSecs:(float)st/1000.0];
+					NSString* title = [NSString stringWithFormat:@"%@ - %@", name, time];
+					NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chapterMenuItemClick:) keyEquivalent:@""];
+					[item setTag:i];
+					[[self chaptersMenu] addItem:item];
+					st = st + gchaps[i].duration;
+				}
+				_MP4Free(gchaps);
 			}
 		}
 	}
@@ -270,7 +298,8 @@
 
 - (void) openMp4:(NSURL*)url
 {
-	QTMovie *nm = [QTMovie movieWithURL:url error:nil];
+	NSError* error;
+	QTMovie *nm = [[QTMovie alloc] initWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[url path], QTMovieFileNameAttribute, [NSNumber numberWithBool:NO], QTMovieEditableAttribute, [NSNumber numberWithBool:YES], QTMovieOpenAsyncOKAttribute, nil] error:&error];//[QTMovie movieWithURL:url error:nil];
 	if(nm)
 	{
 		source = [url copy];
