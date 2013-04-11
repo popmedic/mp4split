@@ -14,13 +14,13 @@ Installation:
 
 Usage:
 
-- Open the application.
+- Open the application. ![Mp4Split Application Startup.](http://www.popmedic.com/mp4split/images/mp4split-blank.png)
 - Open an mp4 file to split.
 - scrub though the movie using the player, make sure and check the key commands, and also you can scrub by chapter.
-- place split marks using the + button under the split panel on the right side.
-- click the split button when you are ready to dice up the movie.
-- fill in the prefix and index offset, or just hit ok to use the defaults.
-- watch how fast the movie is split up.
+- place split marks using the + button under the split panel on the right side. 
+- click the split button when you are ready to dice up the movie. ![Mp4Split Application Startup.](http://www.popmedic.com/mp4split/images/mp4split-loaded.png)
+- fill in the prefix and index offset, or just hit ok to use the defaults.  ![Mp4Split Application Startup.](http://www.popmedic.com/mp4split/images/mp4split-outputsheet.png)
+- watch how fast the movie is split up.  ![Mp4Split Application Startup.](http://www.popmedic.com/mp4split/images/mp4split-splitting.png)
 
 Credit:
 
