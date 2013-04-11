@@ -21,3 +21,15 @@ Usage:
 - click the split button when you are ready to dice up the movie.
 - fill in the prefix and index offset, or just hit ok to use the defaults.
 - watch how fast the movie is split up.
+
+Credit:
+
+- Popmedic (R&D)
+- PenRooter (QA)
+- Pepita (QA)
+- Roy Harper (Support)
+
+Thank you:
+
+- ffmpeg
+- mp4v2
