@@ -558,6 +558,11 @@
 	}
 }
 
+- (IBAction)helpClick:(id)sender
+{
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/popmedic/mp4split#mp4split"]];
+}
+
 - (IBAction)preferencesClick:(id)sender {
 	NSString* ffmpeg_path = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"ffmpeg-path"];
 	if(ffmpeg_path == nil) ffmpeg_path = @"";

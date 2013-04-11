@@ -65,6 +65,7 @@
 - (IBAction)addSplitClick:(id)sender;
 - (IBAction)removeSplitClick:(id)sender;
 - (IBAction)splitButtonClick:(id)sender;
+- (IBAction)helpClick:(id)sender;
 
 - (IBAction)preferencesClick:(id)sender;
 - (IBAction)preferencesCloseButtonClick:(id)sender;
