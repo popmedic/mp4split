@@ -91,6 +91,8 @@
 		[[[[self mainVerticalSplitView] subviews] objectAtIndex:1] setFrameSize:size];
 	}
 	
+	[[self splitsTableView] setDoubleAction:@selector(splitsTableViewDoubleClick:)];
+	
 	[self startSliderTimer];
 	[self refreshButtons];
 }
@@ -681,6 +683,16 @@ objectValueForTableColumn:(NSTableColumn*)tblCol
 	}
 	return @"";
 	
+}
+
+-(IBAction)splitsTableViewDoubleClick:(id)sender
+{
+	NSInteger idx = [[self splitsTableView] clickedRow];
+	if(idx >= 0 && idx < [splits count])
+	{
+		QTTime qttime = [POPTimeConverter qttimeFromSecs:[POPTimeConverter secsFromTimeString:[splits objectAtIndex:idx]] Scale:[[[self mp4Player] movie] currentTime].timeScale];
+		[[[self mp4Player] movie] setCurrentTime:qttime];
+	}
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification

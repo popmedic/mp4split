@@ -72,6 +72,8 @@
 - (IBAction)outputFilenameOkButtonClick:(id)sender;
 - (IBAction)outputFilenameCancelButtonClick:(id)sender;
 
+-(IBAction)splitsTableViewDoubleClick:(id)sender;
+
 - (void) mp4SplitExit;
 - (void)mp4FileProgress:(float)percent;
 - (void)mp4TaskProgress:(float)percent;

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A1B4C88171744AC00384239 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 0A1B4C87171744AC00384239 /* dsa_pub.pem */; };
+		0A1B4C8B171744EA00384239 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A1B4C8A171744EA00384239 /* Sparkle.framework */; };
+		0A1B4C8D1717452B00384239 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0A1B4C8A171744EA00384239 /* Sparkle.framework */; };
 		0A4766A816EA79A80028828B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4766A716EA79A70028828B /* Cocoa.framework */; };
 		0A4766B216EA79A80028828B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0A4766B016EA79A80028828B /* InfoPlist.strings */; };
 		0A4766B416EA79A80028828B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A4766B316EA79A80028828B /* main.m */; };
@@ -27,7 +30,22 @@
 		0AB91A0516EBCFDF00119143 /* POPMp4Splitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AB91A0416EBCFDF00119143 /* POPMp4Splitter.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		0A1B4C8C1717452300384239 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0A1B4C8D1717452B00384239 /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		0A1B4C87171744AC00384239 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
+		0A1B4C8A171744EA00384239 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		0A4766A316EA79A70028828B /* Mp4Split.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mp4Split.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A4766A716EA79A70028828B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		0A4766AA16EA79A80028828B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -65,6 +83,7 @@
 			files = (
 				0A4766D816EA93D70028828B /* QTKit.framework in Frameworks */,
 				0A4766A816EA79A80028828B /* Cocoa.framework in Frameworks */,
+				0A1B4C8B171744EA00384239 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +110,7 @@
 		0A4766A616EA79A70028828B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0A1B4C8A171744EA00384239 /* Sparkle.framework */,
 				0A4766D716EA93D70028828B /* QTKit.framework */,
 				0A4766A716EA79A70028828B /* Cocoa.framework */,
 				0A4766A916EA79A80028828B /* Other Frameworks */,
@@ -130,6 +150,7 @@
 				0A4766B316EA79A80028828B /* main.m */,
 				0A4766B516EA79A80028828B /* Mp4Split-Prefix.pch */,
 				0A4766B616EA79A80028828B /* Credits.rtf */,
+				0A1B4C87171744AC00384239 /* dsa_pub.pem */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -187,6 +208,7 @@
 				0A47669F16EA79A70028828B /* Sources */,
 				0A4766A016EA79A70028828B /* Frameworks */,
 				0A4766A116EA79A70028828B /* Resources */,
+				0A1B4C8C1717452300384239 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -240,6 +262,7 @@
 				0AB919FD16EBB1D400119143 /* pause-128.png in Resources */,
 				0AB919FE16EBB1D400119143 /* play-128.png in Resources */,
 				0A750BEA16ED5E43008256E7 /* ffmpeg in Resources */,
+				0A1B4C88171744AC00384239 /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,6 +368,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Mp4Split/Mp4Split-Prefix.pch";
 				INFOPLIST_FILE = "Mp4Split/Mp4Split-Info.plist";
@@ -361,6 +388,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Mp4Split/Mp4Split-Prefix.pch";
 				INFOPLIST_FILE = "Mp4Split/Mp4Split-Info.plist";

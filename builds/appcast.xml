@@ -1,0 +1,22 @@
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<channel>
+   		<title>Mp4Split Changelog</title>
+      	<link>http://popmedic.com/mp4split_builds/appcast.xml</link>
+      	<description>Base version.</description>
+      	<language>en</language>
+		<item>
+        	<title>Version 0.0.2 (beta release 0.2)</title>
+			<sparkle:releaseNotesLink>
+				http://popmedic.com/mp4split_builds/0.0.2.html
+			</sparkle:releaseNotesLink>
+          	<pubDate>Thu, 11 Apr 2013 11:30:33 +0700</pubDate>
+          	<enclosure
+			url="http://popmedic.com/mp4split_builds/latest/Mp4Split.zip"
+			sparkle:version="0.0.2"
+			sparkle:dsaSignature="MC0CFQDHPdXYipgxvCgeK0BxqE47S/d7bAIUATwN7VQAeiaUWZPvy4Z15guDxRQ="
+			length="6252595"
+			type="application/octet-stream"
+			/>
+		</item>
+   </channel>
+</rss>
