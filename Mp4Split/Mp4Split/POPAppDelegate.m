@@ -563,6 +563,79 @@
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/popmedic/mp4split#mp4split"]];
 }
 
+- (IBAction)splitEveryChaptersClick:(id)sender
+{
+	if([[self mp4Player] movie] != nil)
+	{
+		NSAlert *alert = [NSAlert alertWithMessageText:@"Place a split every chapter?"
+									 defaultButton:@"OK"
+								   alternateButton:@"Cancel"
+									   otherButton:nil
+						 informativeTextWithFormat:@""];
+		NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+		[input setStringValue:@"1"];
+		[alert setAccessoryView:input];
+		NSInteger choose = [alert runModal];
+		if (choose == NSAlertDefaultReturn)
+		{
+			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2.dylib" ofType:@"dylib"]];
+			NSInteger everyXChpts = [[input stringValue] integerValue];
+			MP4FileHandle mp4file = _MP4Modify([[source path] cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
+			unsigned int chapCnt;
+			MP4Chapter_t *gchaps;
+			_MP4GetChapters(mp4file, &gchaps, &chapCnt, MP4ChapterTypeNero);
+			_MP4Close(mp4file, 0);
+		
+			if(gchaps != NULL)
+			{
+				MP4Duration st = 0.0;
+				NSInteger i = 0;
+				while(i < chapCnt)
+				{
+					[splits addObject:[POPTimeConverter timeStringFromSecs:(float)st/1000.0]];
+					st = st + gchaps[i].duration;
+					i = i + everyXChpts;
+				}
+				[[self splitsTableView]reloadData];
+				[[self segmentsTableView]reloadData];
+				_MP4Free(gchaps);
+			}
+		}
+	}
+}
+
+- (IBAction)splitEverySecondsClick:(id)sender
+{
+	if([[self mp4Player] movie] != nil)
+	{
+		NSAlert *alert = [NSAlert alertWithMessageText:@"Place a split every chapter?"
+										 defaultButton:@"OK"
+									   alternateButton:@"Cancel"
+										   otherButton:nil
+							 informativeTextWithFormat:@""];
+		NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+		[input setStringValue:@"1"];
+		[alert setAccessoryView:input];
+		NSInteger choose = [alert runModal];
+		if (choose == NSAlertDefaultReturn)
+		{
+			double cur_secs = 0.0;
+			double total_secs = [POPTimeConverter secsFromQTTime:[[[self mp4Player]movie]duration] FrameRate:currentFrameRate];
+			double everyXSecs = [[input stringValue]doubleValue];
+			if(everyXSecs > 0)
+			{
+				while(cur_secs < total_secs)
+				{
+					[splits addObject:[POPTimeConverter timeStringFromSecs:cur_secs]];
+					cur_secs = cur_secs + everyXSecs;
+				}
+				[[self splitsTableView]reloadData];
+				[[self segmentsTableView]reloadData];
+			}
+		}
+	}
+}
+
 - (IBAction)preferencesClick:(id)sender {
 	NSString* ffmpeg_path = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:@"ffmpeg-path"];
 	if(ffmpeg_path == nil) ffmpeg_path = @"";
