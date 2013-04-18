@@ -460,20 +460,114 @@
 }
 
 - (IBAction)addSplitClick:(id)sender {
-	[splits addObject:[POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate]];
+	NSString* addStr = [POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
+	[splits addObject:addStr];
 	[splits sortUsingComparator:^(id s1, id s2){
 		return [(NSString*)s1 compare:(NSString*)s2];
 	}];
 	[self refreshButtons];
 	[self refreshTables];
+	for(int i = 0; i < [splits count]; i++)
+	{
+		if([addStr compare:[splits objectAtIndex:i]] == 0)
+		{
+			[[self splitsTableView] selectRowIndexes:[NSIndexSet indexSetWithIndex:i] byExtendingSelection:NO];
+			i = (int)[splits count];
+		}
+	}
 }
 
 - (IBAction)removeSplitClick:(id)sender {
-	if([[self splitsTableView] selectedRow] > -1)
+	NSInteger selectedRow = [[self splitsTableView] selectedRow];
+		if(selectedRow > -1)
 	{
-		[splits removeObjectAtIndex:[[self splitsTableView] selectedRow]];
+		[splits removeObjectAtIndex:selectedRow];
 		[self refreshButtons];
 		[self refreshTables];
+		if([splits count] > 0)
+		{
+			if(selectedRow < [splits count])
+			{
+				[[self splitsTableView] selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedRow] byExtendingSelection:NO];
+			}
+			else
+			{
+				[[self splitsTableView] selectRowIndexes:[NSIndexSet indexSetWithIndex:[splits count]-1] byExtendingSelection:NO];
+			}
+		}
+	}
+}
+
+- (IBAction)splitEveryChaptersClick:(id)sender
+{
+	if([[self mp4Player] movie] != nil)
+	{
+		NSAlert *alert = [NSAlert alertWithMessageText:@"Place a split every chapter?"
+										 defaultButton:@"OK"
+									   alternateButton:@"Cancel"
+										   otherButton:nil
+							 informativeTextWithFormat:@""];
+		NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+		[input setStringValue:@"1"];
+		[alert setAccessoryView:input];
+		NSInteger choose = [alert runModal];
+		if (choose == NSAlertDefaultReturn)
+		{
+			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2.dylib" ofType:@"dylib"]];
+			NSInteger everyXChpts = [[input stringValue] integerValue];
+			MP4FileHandle mp4file = _MP4Modify([[source path] cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
+			unsigned int chapCnt;
+			MP4Chapter_t *gchaps;
+			_MP4GetChapters(mp4file, &gchaps, &chapCnt, MP4ChapterTypeNero);
+			_MP4Close(mp4file, 0);
+			
+			if(gchaps != NULL)
+			{
+				MP4Duration st = 0.0;
+				NSInteger i = 0;
+				while(i < chapCnt)
+				{
+					[splits addObject:[POPTimeConverter timeStringFromSecs:(float)st/1000.0]];
+					st = st + gchaps[i].duration;
+					i = i + everyXChpts;
+				}
+				[self refreshTables];
+				[self refreshButtons];
+				_MP4Free(gchaps);
+			}
+		}
+	}
+}
+
+- (IBAction)splitEverySecondsClick:(id)sender
+{
+	if([[self mp4Player] movie] != nil)
+	{
+		NSAlert *alert = [NSAlert alertWithMessageText:@"Place a split every chapter?"
+										 defaultButton:@"OK"
+									   alternateButton:@"Cancel"
+										   otherButton:nil
+							 informativeTextWithFormat:@""];
+		NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+		[input setStringValue:@"1"];
+		[alert setAccessoryView:input];
+		NSInteger choose = [alert runModal];
+		if (choose == NSAlertDefaultReturn)
+		{
+			double cur_secs = 0.0;
+			double total_secs = [POPTimeConverter secsFromQTTime:[[[self mp4Player]movie]duration] FrameRate:currentFrameRate];
+			double everyXSecs = [[input stringValue]doubleValue];
+			if(everyXSecs > 0)
+			{
+				while(cur_secs < total_secs)
+				{
+					[splits addObject:[POPTimeConverter timeStringFromSecs:cur_secs]];
+					cur_secs = cur_secs + everyXSecs;
+				}
+				[self refreshTables];
+				[self refreshButtons];
+			}
+		}
 	}
 }
 
@@ -561,79 +655,6 @@
 - (IBAction)helpClick:(id)sender
 {
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/popmedic/mp4split#mp4split"]];
-}
-
-- (IBAction)splitEveryChaptersClick:(id)sender
-{
-	if([[self mp4Player] movie] != nil)
-	{
-		NSAlert *alert = [NSAlert alertWithMessageText:@"Place a split every chapter?"
-									 defaultButton:@"OK"
-								   alternateButton:@"Cancel"
-									   otherButton:nil
-						 informativeTextWithFormat:@""];
-		NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
-		[input setStringValue:@"1"];
-		[alert setAccessoryView:input];
-		NSInteger choose = [alert runModal];
-		if (choose == NSAlertDefaultReturn)
-		{
-			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2.dylib" ofType:@"dylib"]];
-			NSInteger everyXChpts = [[input stringValue] integerValue];
-			MP4FileHandle mp4file = _MP4Modify([[source path] cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
-			unsigned int chapCnt;
-			MP4Chapter_t *gchaps;
-			_MP4GetChapters(mp4file, &gchaps, &chapCnt, MP4ChapterTypeNero);
-			_MP4Close(mp4file, 0);
-		
-			if(gchaps != NULL)
-			{
-				MP4Duration st = 0.0;
-				NSInteger i = 0;
-				while(i < chapCnt)
-				{
-					[splits addObject:[POPTimeConverter timeStringFromSecs:(float)st/1000.0]];
-					st = st + gchaps[i].duration;
-					i = i + everyXChpts;
-				}
-				[[self splitsTableView]reloadData];
-				[[self segmentsTableView]reloadData];
-				_MP4Free(gchaps);
-			}
-		}
-	}
-}
-
-- (IBAction)splitEverySecondsClick:(id)sender
-{
-	if([[self mp4Player] movie] != nil)
-	{
-		NSAlert *alert = [NSAlert alertWithMessageText:@"Place a split every chapter?"
-										 defaultButton:@"OK"
-									   alternateButton:@"Cancel"
-										   otherButton:nil
-							 informativeTextWithFormat:@""];
-		NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
-		[input setStringValue:@"1"];
-		[alert setAccessoryView:input];
-		NSInteger choose = [alert runModal];
-		if (choose == NSAlertDefaultReturn)
-		{
-			double cur_secs = 0.0;
-			double total_secs = [POPTimeConverter secsFromQTTime:[[[self mp4Player]movie]duration] FrameRate:currentFrameRate];
-			double everyXSecs = [[input stringValue]doubleValue];
-			if(everyXSecs > 0)
-			{
-				while(cur_secs < total_secs)
-				{
-					[splits addObject:[POPTimeConverter timeStringFromSecs:cur_secs]];
-					cur_secs = cur_secs + everyXSecs;
-				}
-				[[self splitsTableView]reloadData];
-				[[self segmentsTableView]reloadData];
-			}
-		}
-	}
 }
 
 - (IBAction)preferencesClick:(id)sender {
