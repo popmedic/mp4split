@@ -524,12 +524,13 @@
 			if(gchaps != NULL)
 			{
 				MP4Duration st = 0.0;
-				NSInteger i = 0;
-				while(i < chapCnt)
+				for(NSInteger i = 0;i < chapCnt; i++)
 				{
-					[splits addObject:[POPTimeConverter timeStringFromSecs:(float)st/1000.0]];
+					if(((i+1) % everyXChpts) == 0 || i == 0)
+					{
+						[splits addObject:[POPTimeConverter timeStringFromSecs:(float)st/1000.0]];
+					}
 					st = st + gchaps[i].duration;
-					i = i + everyXChpts;
 				}
 				[self refreshTables];
 				[self refreshButtons];
