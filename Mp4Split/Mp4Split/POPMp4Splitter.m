@@ -33,8 +33,19 @@
 	[task setLaunchPath:ffmpeg_path];
 	[task setStandardOutput:[NSPipe pipe]];
 	[task setStandardError:[task standardOutput]];
-	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src, @"-copyts",
-						@"-acodec", @"copy", @"-vcodec", @"copy", dst,nil]];
+//	[task setArguments:[NSArray arrayWithObjects:@"-ss", ss, @"-t", len, @"-i", src, @"-copyts",
+//						@"-acodec", @"copy", @"-vcodec", @"copy", dst,nil]];
+	[task setArguments:[NSArray arrayWithObjects:
+						@"-ss", ss,
+						@"-t", len,
+						@"-i", src,
+						@"-map", @"0:0",
+						@"-map", @"0:1",
+						@"-copyts",
+						@"-c:v", @"copy",
+						@"-c:a:0", @"copy",
+						@"-threads", @"0",
+						dst,nil]];
 	return task;
 }
 

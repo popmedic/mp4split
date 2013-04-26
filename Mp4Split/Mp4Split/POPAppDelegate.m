@@ -221,7 +221,7 @@
 		}
 		else
 		{
-			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2.dylib" ofType:@"dylib"]];
+			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2" ofType:@"dylib"]];
 			MP4FileHandle mp4file = _MP4Modify([[source path] cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
 			unsigned int chapCnt;
 			MP4Chapter_t *gchaps;
@@ -301,7 +301,8 @@
 - (void) openMp4:(NSURL*)url
 {
 	NSError* error;
-	QTMovie *nm = [[QTMovie alloc] initWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[url path], QTMovieFileNameAttribute, [NSNumber numberWithBool:NO], QTMovieEditableAttribute, [NSNumber numberWithBool:YES], QTMovieOpenAsyncOKAttribute, nil] error:&error];//[QTMovie movieWithURL:url error:nil];
+//	QTMovie *nm = [[QTMovie alloc] initWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[url path], QTMovieFileNameAttribute, [NSNumber numberWithBool:NO], QTMovieEditableAttribute, [NSNumber numberWithBool:YES], QTMovieOpenAsyncOKAttribute, nil] error:&error];
+	QTMovie *nm = [QTMovie movieWithURL:url error:&error];
 	if(nm)
 	{
 		source = [url copy];
@@ -319,6 +320,39 @@
 		mp4Loading = YES;
 		[self refreshButtons];
 		[self refreshTables];
+		
+//		NSMutableString* outStr = [[NSMutableString alloc] initWithString:
+//								   [NSString stringWithFormat:@"Movie \"%@\" Attributes:\n\n", [url path]]];
+//		NSDictionary* attrs = [nm movieAttributes];
+//		NSEnumerator* keyEnumerator = [attrs keyEnumerator];
+//		id key;
+//		while((key = [keyEnumerator nextObject]) != nil)
+//		{
+//			[outStr appendFormat:@"\t%@: %@\n", key, [attrs objectForKey:key]];
+//		}
+//		[outStr appendString:@"\nTracks:"];
+//		NSArray* tracks = [nm tracks];
+//		for (int i = 0; i < [tracks count]; i++)
+//		{
+//			
+//			QTTrack* track = [tracks objectAtIndex:i];
+//			[outStr appendFormat:@"\n\tTrack %i", i];
+//			NSDictionary* trackAttrs = [track trackAttributes];
+//			keyEnumerator = [trackAttrs keyEnumerator];
+//			while((key = [keyEnumerator nextObject]) != nil)
+//			{
+//				[outStr appendFormat:@"\n\t\t%@: %@", key, [trackAttrs objectForKey:key]];
+//			}
+//		}
+//		NSLog(@"%@", outStr);
+	}
+	else
+	{
+		NSRunAlertPanel(@"UNABLE TO OPEN",
+						[NSString stringWithFormat:@"Unable to open:%@\n\nReason:\n%@", [url path], [error description]],
+						@"Ok",
+						nil,
+						nil);
 	}
 }
 - (IBAction)openMp4Click:(id)sender {
@@ -513,7 +547,7 @@
 		NSInteger choose = [alert runModal];
 		if (choose == NSAlertDefaultReturn)
 		{
-			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2.dylib" ofType:@"dylib"]];
+			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2" ofType:@"dylib"]];
 			NSInteger everyXChpts = [[input stringValue] integerValue];
 			MP4FileHandle mp4file = _MP4Modify([[source path] cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
 			unsigned int chapCnt;
