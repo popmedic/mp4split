@@ -173,11 +173,11 @@
 		NSString* mt = [[track trackAttributes] objectForKey:QTTrackMediaTypeAttribute];
 		NSNumber* layer = [[track trackAttributes] objectForKey:QTTrackLayerAttribute];
 		NSLog(@"Track %i Type/layer: %@/%i", ti, mt, [layer shortValue]);
-		if([mt compare:@"vide"] == 0 && [layer shortValue] == -1)
-		{
-			[track setEnabled:NO];
-			//DisposeMovieTrack([track quickTimeTrack]);
-		}
+//		if([mt compare:@"vide"] == 0 && [layer shortValue] == -1)
+//		{
+//			[track setEnabled:NO];
+//			DisposeMovieTrack([track quickTimeTrack]);
+//		}
 		ti++;
     }
 }
