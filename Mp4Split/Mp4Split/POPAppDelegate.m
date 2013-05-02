@@ -245,6 +245,36 @@
 				}
 				_MP4Free(gchaps);
 			}
+			else
+			{
+				//see if we have a .chptr file.
+				NSString *chptrPath = [[[source path] stringByDeletingPathExtension] stringByAppendingPathExtension:@"chptr"];
+				if([[NSFileManager defaultManager] fileExistsAtPath:chptrPath])
+				{
+					//if we do read it in...
+					NSError *error;
+					NSString* chptrFileString = [NSString stringWithContentsOfFile:chptrPath encoding:NSStringEncodingConversionAllowLossy error:&error];
+					NSArray* chptrFileArray = [chptrFileString componentsSeparatedByString:@"\n"];
+					if(chptrFileArray != nil)
+					{
+						int i = 0;
+						float st = 0.0;
+						for (NSString* line in chptrFileArray) {
+							NSArray* ttlStPair = [line componentsSeparatedByString:@":"];
+							if([ttlStPair count] > 1)
+							{
+								NSString *chptrName = [ttlStPair objectAtIndex:0];
+								st += (float)[[ttlStPair objectAtIndex:1] doubleValue];
+								NSString *chptrTime = [POPTimeConverter timeStringFromSecs:(float)st];
+								NSString* chptrTitle = [NSString stringWithFormat:@"%@ - %@", chptrName, chptrTime];
+								NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:chptrTitle action:@selector(chapterMenuItemClick:) keyEquivalent:@""];
+								[item setTag:i++];
+								[[self chaptersMenu] addItem:item];
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
