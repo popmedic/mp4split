@@ -167,15 +167,18 @@
 
 - (void)removeSubtitleTracks:(QTMovie*) movie
 {
+	int ti = 0;
 	for (QTTrack* track in [movie tracks])
     {
 		NSString* mt = [[track trackAttributes] objectForKey:QTTrackMediaTypeAttribute];
 		NSNumber* layer = [[track trackAttributes] objectForKey:QTTrackLayerAttribute];
+		NSLog(@"Track %i Type/layer: %@/%i", ti, mt, [layer shortValue]);
 		if([mt compare:@"vide"] == 0 && [layer shortValue] == -1)
 		{
 			[track setEnabled:NO];
 			//DisposeMovieTrack([track quickTimeTrack]);
 		}
+		ti++;
     }
 }
 
@@ -493,22 +496,36 @@
 	}
 }
 
-- (IBAction)addSplitClick:(id)sender {
-	NSString* addStr = [POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
-	[splits addObject:addStr];
-	[splits sortUsingComparator:^(id s1, id s2){
-		return [(NSString*)s1 compare:(NSString*)s2];
+-(void)addSplit:(QTTime)time
+{
+	NSString* addStr = [POPTimeConverter timeStringFromQTTime:time FrameRate:currentFrameRate];
+	NSImage* img = [[[self mp4Player] movie] frameImageAtTime:time];
+	NSDictionary* dic = [NSDictionary dictionaryWithObjectsAndKeys:addStr, @"startTimeStr", img, @"image", nil];
+	[splits addObject:dic];
+	[splits sortUsingComparator:^(id o1, id o2){
+		return [(NSString*)[(NSDictionary*)o1 objectForKey:@"startTimeStr"]  compare:(NSString*)[(NSDictionary*)o2 objectForKey:@"startTimeStr"]];
 	}];
-	[self refreshButtons];
-	[self refreshTables];
+	
 	for(int i = 0; i < [splits count]; i++)
 	{
-		if([addStr compare:[splits objectAtIndex:i]] == 0)
+		NSDictionary* dic = [splits objectAtIndex:i];
+		if([addStr compare:[dic objectForKey:@"startTimeStr"]] == 0)
 		{
 			[[self splitsTableView] selectRowIndexes:[NSIndexSet indexSetWithIndex:i] byExtendingSelection:NO];
 			i = (int)[splits count];
 		}
 	}
+}
+
+- (IBAction)addSplitClick:(id)sender {
+	/*NSString* addStr = [POPTimeConverter timeStringFromQTTime:[[[self mp4Player] movie] currentTime] FrameRate:currentFrameRate];
+	NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[[[self mp4Player] movie] currentTime]];
+	[splits addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"startTimeStr", addStr, @"image", img, nil]];
+	[splits sortUsingComparator:^(id o1, id o2){
+		return [(NSString*)[(NSDictionary*)o1 objectForKey:@"startTimeStr"]  compare:(NSString*)[(NSDictionary*)o2 objectForKey:@"startTimeStr"]]; }];*/
+	[self addSplit:[[[self mp4Player] movie] currentTime]];
+	[self refreshButtons];
+	[self refreshTables];
 }
 
 - (IBAction)removeSplitClick:(id)sender {
@@ -562,11 +579,25 @@
 				{
 					if(i == 0)
 					{
-						[splits addObject:[POPTimeConverter timeStringFromSecs:(float)st/1000.0]];
+						NSString* startTimeStr = [POPTimeConverter timeStringFromSecs:(float)st/1000.0];
+						NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)st/1000 Scale:[[[self mp4Player] movie] currentTime].timeScale]];
+						[splits addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+										   startTimeStr,
+										   @"startTimeStr",
+										   img,
+										   @"image",
+										   nil]];
 					}
 					else if (i % everyXChpts == 0)
 					{
-						[splits addObject:[POPTimeConverter timeStringFromSecs:(float)st/1000.0]];
+						NSString* startTimeStr = [POPTimeConverter timeStringFromSecs:(float)st/1000.0];
+						NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)st/1000 Scale:[[[self mp4Player] movie] currentTime].timeScale]];
+						[splits addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+										   startTimeStr,
+										   @"startTimeStr",
+										   img,
+										   @"image",
+										   nil]];
 					}
 						
 					st = st + gchaps[i].duration;
@@ -601,7 +632,13 @@
 			{
 				while(cur_secs < total_secs)
 				{
-					[splits addObject:[POPTimeConverter timeStringFromSecs:cur_secs]];
+					//[splits addObject:[POPTimeConverter timeStringFromSecs:cur_secs]];
+					[splits addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+									   [POPTimeConverter timeStringFromSecs:cur_secs],
+									   @"startTimeStr",
+									   [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)cur_secs Scale:[[[self mp4Player] movie] currentTime].timeScale]],
+									   @"image",
+									   nil]];
 					cur_secs = cur_secs + everyXSecs;
 				}
 				[self refreshTables];
@@ -632,9 +669,9 @@
 		 NSMutableArray* tasks = [[NSMutableArray alloc] init];
 		 for(int i = 0; i < [splits count]-1; i++)
 		 {
-			 NSString* startstr = splits[i];
+			 NSString* startstr = [[splits objectAtIndex:i] objectForKey:@"startTimeStr"];
 			 float startsecs = [POPTimeConverter secsFromTimeString:startstr];
-			 float lengthsecs = [POPTimeConverter secsFromTimeString:splits[i+1]] - startsecs;
+			 float lengthsecs = [POPTimeConverter secsFromTimeString:[[splits objectAtIndex:i+1] objectForKey:@"startTimeStr"]] - startsecs;
 			 NSString* lengthstr = [POPTimeConverter timeStringFromSecs:lengthsecs];
 			 
 			 NSString* srcpath = [source path];
@@ -802,13 +839,22 @@ objectValueForTableColumn:(NSTableColumn*)tblCol
 {
     if(tblView == [self splitsTableView])
 	{
-		return splits[rowInd];
+		if([[tblCol identifier] compare:@"splitstablestrcol"] == 0)
+		{
+			NSString* startTimeStr = [[splits objectAtIndex:rowInd] objectForKey:@"startTimeStr"];
+			return startTimeStr;
+		}
+		else if([[tblCol identifier] compare:@"splitstableimgcol"] == 0)
+		{
+			NSImage* img = [[splits objectAtIndex:rowInd] objectForKey:@"image"];
+			return img;
+		}
 	}
 	else if(tblView == [self segmentsTableView])
 	{
-		NSString* startstr = splits[rowInd];
+		NSString* startstr = [[splits objectAtIndex:rowInd] objectForKey:@"startTimeStr"];
 		float startsecs = [POPTimeConverter secsFromTimeString:startstr];
-		float lengthsecs = [POPTimeConverter secsFromTimeString:splits[rowInd+1]] - startsecs;
+		float lengthsecs = [POPTimeConverter secsFromTimeString:[[splits objectAtIndex:rowInd+1] objectForKey:@"startTimeStr"]] - startsecs;
 		NSString* lengthstr = [POPTimeConverter timeStringFromSecs:lengthsecs];
 		if([[tblCol identifier] compare:@"segmentstablestartcol"] == 0)
 		{
@@ -829,7 +875,7 @@ objectValueForTableColumn:(NSTableColumn*)tblCol
 	NSInteger idx = [[self splitsTableView] clickedRow];
 	if(idx >= 0 && idx < [splits count])
 	{
-		QTTime qttime = [POPTimeConverter qttimeFromSecs:[POPTimeConverter secsFromTimeString:[splits objectAtIndex:idx]] Scale:[[[self mp4Player] movie] currentTime].timeScale];
+		QTTime qttime = [POPTimeConverter qttimeFromSecs:[POPTimeConverter secsFromTimeString:[[splits objectAtIndex:idx] objectForKey:@"startTimeStr"]] Scale:[[[self mp4Player] movie] currentTime].timeScale];
 		[[[self mp4Player] movie] setCurrentTime:qttime];
 	}
 }
