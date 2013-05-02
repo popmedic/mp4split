@@ -78,6 +78,7 @@
 	oldSliderValue = 0.0;
 	splits = [[NSMutableArray alloc] init];
 	[[self mp4Player] setMovie:nil];
+	[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2" ofType:@"dylib"]];
 	
 	CGFloat f = [[[NSUserDefaults standardUserDefaults] valueForKey:@"vsplit1"] floatValue];
 	NSSize size;
@@ -219,12 +220,15 @@
 				NSString* title = [NSString stringWithFormat:@"%@ - %@", name, time];
 				NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chapterMenuItemClick:) keyEquivalent:@""];
 				[item setTag:i];
+				NSImage* img = [[[self mp4Player] movie] frameImageAtTime:qttime];
+				[img setScalesWhenResized:YES];
+				[img setSize:NSSizeFromString(@"{32,20}")];
+				[item setImage:img];
 				[[self chaptersMenu] addItem:item];
 			}
 		}
 		else
 		{
-			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2" ofType:@"dylib"]];
 			MP4FileHandle mp4file = _MP4Modify([[source path] cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
 			unsigned int chapCnt;
 			MP4Chapter_t *gchaps;
@@ -240,6 +244,10 @@
 					NSString* title = [NSString stringWithFormat:@"%@ - %@", name, time];
 					NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(chapterMenuItemClick:) keyEquivalent:@""];
 					[item setTag:i];
+					NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)st/1000 Scale:[[[self mp4Player] movie] currentTime].timeScale]];
+					[img setScalesWhenResized:YES];
+					[img setSize:NSSizeFromString(@"{32,20}")];
+					[item setImage:img];
 					[[self chaptersMenu] addItem:item];
 					st = st + gchaps[i].duration;
 				}
@@ -269,6 +277,10 @@
 								NSString* chptrTitle = [NSString stringWithFormat:@"%@ - %@", chptrName, chptrTime];
 								NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:chptrTitle action:@selector(chapterMenuItemClick:) keyEquivalent:@""];
 								[item setTag:i++];
+								NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)st Scale:[[[self mp4Player] movie] currentTime].timeScale]];
+								[img setScalesWhenResized:YES];
+								[item setImage:img];
+								[img setSize:NSSizeFromString(@"{32,20}")];
 								[[self chaptersMenu] addItem:item];
 							}
 						}
@@ -277,6 +289,35 @@
 			}
 		}
 	}
+}
+-(NSArray*)chaptersArrayFromChaptersMenu
+{
+	if([[[self chaptersMenu] itemArray] count] > 0)
+	{
+		NSMutableArray* chaps = [NSMutableArray array];
+		float duration = 0.0;
+		float total_dur = 0.0;
+		for(NSMenuItem* menuItem in [[self chaptersMenu] itemArray])
+		{
+			NSArray* a = [[menuItem title] componentsSeparatedByString:@" - "];
+			NSString* title = [a objectAtIndex:0];
+			float st = [POPTimeConverter secsFromTimeString:[a objectAtIndex:1]];
+			total_dur = total_dur + duration;
+			duration = st - total_dur;
+			
+			NSDictionary* dic = [NSDictionary dictionaryWithObjectsAndKeys:
+								 title, @"title",
+								 [NSNumber numberWithFloat:st], @"startTime",
+								 [NSNumber numberWithFloat:duration], @"duration",
+								 nil];
+			[chaps addObject:dic];
+		}
+		if([chaps count] > 0)
+		{
+			return chaps;
+		}
+	}
+	return nil;
 }
 
 - (void)refreshSlider:(NSTimer*)theTimer
@@ -292,6 +333,8 @@
 			if(res == 1)
 			{
 				[[self mp4LoadingProgressIndicator] setHidden:YES];
+				[self unloadMovieChapters];
+				[self loadMovieChapters:[[self mp4Player] movie]];
 				mp4Loading = NO;
 			}
 			
@@ -594,23 +637,17 @@
 		NSInteger choose = [alert runModal];
 		if (choose == NSAlertDefaultReturn)
 		{
-			[POPmp4v2dylibloader loadMp4v2Lib:[[NSBundle mainBundle] pathForResource:@"libmp4v2.2" ofType:@"dylib"]];
 			NSInteger everyXChpts = [[input stringValue] integerValue];
-			MP4FileHandle mp4file = _MP4Modify([[source path] cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
-			unsigned int chapCnt;
-			MP4Chapter_t *gchaps;
-			_MP4GetChapters(mp4file, &gchaps, &chapCnt, MP4ChapterTypeNero);
-			_MP4Close(mp4file, 0);
-			
-			if(gchaps != NULL)
+			NSArray* gchaps = [self chaptersArrayFromChaptersMenu];
+			if(gchaps != nil)
 			{
-				MP4Duration st = 0.0;
-				for(NSInteger i = 0;i < chapCnt; i++)
+				float st = 0.0;
+				for(NSInteger i = 0;i < [gchaps count]; i++)
 				{
 					if(i == 0)
 					{
-						NSString* startTimeStr = [POPTimeConverter timeStringFromSecs:(float)st/1000.0];
-						NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)st/1000 Scale:[[[self mp4Player] movie] currentTime].timeScale]];
+						NSString* startTimeStr = [POPTimeConverter timeStringFromSecs:(float)st];
+						NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)st Scale:[[[self mp4Player] movie] currentTime].timeScale]];
 						[splits addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 										   startTimeStr,
 										   @"startTimeStr",
@@ -618,10 +655,11 @@
 										   @"image",
 										   nil]];
 					}
-					else if (i % everyXChpts == 0)
+					st = st + [[[gchaps objectAtIndex:i] objectForKey:@"duration"] floatValue];
+					if (i % everyXChpts == 0)
 					{
-						NSString* startTimeStr = [POPTimeConverter timeStringFromSecs:(float)st/1000.0];
-						NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)st/1000 Scale:[[[self mp4Player] movie] currentTime].timeScale]];
+						NSString* startTimeStr = [POPTimeConverter timeStringFromSecs:(float)st];
+						NSImage* img = [[[self mp4Player] movie] frameImageAtTime:[POPTimeConverter qttimeFromSecs:(float)st Scale:[[[self mp4Player] movie] currentTime].timeScale]];
 						[splits addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 										   startTimeStr,
 										   @"startTimeStr",
@@ -629,12 +667,10 @@
 										   @"image",
 										   nil]];
 					}
-						
-					st = st + gchaps[i].duration;
+					
 				}
 				[self refreshTables];
 				[self refreshButtons];
-				_MP4Free(gchaps);
 			}
 		}
 	}
@@ -731,7 +767,7 @@
 			 }
 		 }
 		 if(_splitter != nil) _splitter = nil;
-		 _splitter = [[POPMp4Splitter alloc] initWithTasks:tasks];
+		 _splitter = [[POPMp4Splitter alloc] initWithTasks:tasks Chapters:[self chaptersArrayFromChaptersMenu]];
 		 [_splitter setDelegate:self];
 		 [[self taskProgressIndicator] setDoubleValue:0.0];
 		 [[self taskProgressIndicator] setHidden:NO];

@@ -7,11 +7,13 @@
 //
 
 #import "POPMp4Splitter.h"
+#import "POPmp4v2dylibloader.h"
 #import "POPTimeConverter.h"
 
 @implementation POPMp4Splitter
 {
 	NSMutableArray* tasks;
+	NSMutableArray* chapters;
 	int currentTaskIdx;
 	float currentTaskDuration;
 	id <POPMp4SplitterDelegate> _delegate;
@@ -109,13 +111,43 @@
 	return NO;
 }
 
--(id) initWithTasks:(NSArray*)tsks
+-(id) initWithTasks:(NSArray*)tsks Chapters:(NSArray *)chaps
 {
 	_delegate = nil;
-	tasks = [[NSMutableArray alloc]init];
+	//copy the chaps array into chapters
+	tasks = [[NSMutableArray alloc] init];
+	chapters = [[NSMutableArray alloc] init];
+	for (NSDictionary* chap in chaps) {
+		NSLog(@"Chapter start time %f, duration %f",  [[chap objectForKey:@"startTime"] floatValue],  [[chap objectForKey:@"duration"] floatValue]);
+	}
 	for(int i = 0; i < [tsks count]; i++)
 	{
-		[tasks addObject:[tsks objectAtIndex:i]];
+		NSTask* tsk = [tsks objectAtIndex:i];
+		[tasks addObject:tsk];
+		
+		NSMutableArray* mchaps = [[NSMutableArray alloc] init];
+		float st = [POPTimeConverter secsFromTimeString:[[[tsk arguments] objectAtIndex:1] copy]];
+		float dur = [POPTimeConverter secsFromTimeString:[[[tsk arguments] objectAtIndex:3] copy]];
+		float et = st + dur;
+		int ii = 1;
+		NSLog(@"Task %i: %f to %f:", i, st, et);
+		for(NSDictionary* chap in chaps)
+		{
+			float cst = [[chap objectForKey:@"startTime"] floatValue];
+			if(cst > st && cst <= et)
+			{
+				float ndur = cst - st;
+				NSString* ntitle = [NSString stringWithFormat:@"%i", ii++];
+				st = cst;
+				NSLog(@"Chapter %i duration %f", ii, ndur);
+				NSDictionary* dic = [NSDictionary dictionaryWithObjectsAndKeys:
+									 ntitle, @"title",
+									 [NSNumber numberWithFloat:ndur], @"duration",
+									 nil];
+				[mchaps addObject:dic];
+			}
+		}
+		[chapters addObject:mchaps];
 	}
 	splitting = false;
 	currentTaskIdx = 0;
@@ -172,8 +204,9 @@
 
 - (void)taskExited
 {
-    NSTask* task = (NSTask*)[tasks objectAtIndex:currentTaskIdx];
-    [[NSNotificationCenter defaultCenter]
+	NSTask* task = (NSTask*)[tasks objectAtIndex:currentTaskIdx];
+	NSString* outPath = [[[task arguments] objectAtIndex:([[task arguments] count] - 1)] copy];
+    [[NSNotificationCenter defaultCenter] 
      removeObserver:self
      name:NSFileHandleReadCompletionNotification
      object:[[task standardOutput] fileHandleForReading]];
@@ -191,6 +224,43 @@
 	if([task terminationStatus] != 0)
 	{
 		NSRunAlertPanel(@"FFMPEG ERROR", [NSString stringWithFormat:@"ffmpeg was unable to complete its task with exit status %i", [task terminationStatus]], @"OK", nil, nil);
+	}
+	else
+	{
+		NSArray* cchps = [chapters objectAtIndex:currentTaskIdx];
+#pragma mark Add mp4 chapters
+		//add the mp4 chapter marks.
+		MP4FileHandle mp4File = _MP4Modify([outPath cStringUsingEncoding:NSStringEncodingConversionAllowLossy], 0);
+		if(mp4File != NULL)
+		{
+			MP4Chapter_t* mp4Chapters = malloc(sizeof(MP4Chapter_t)*[cchps count]);
+			//		NSMutableArray* m4vChapters = [NSMutableArray array];
+			//		unsigned long long chap_st_secs = 0.0;
+			for(int i = 0; i < [cchps count]; i++)
+			{
+				float chap_len_secs = [[[cchps objectAtIndex:i] objectForKey:@"duration"] floatValue];
+				NSString* chap_name = [[cchps objectAtIndex:i] objectForKey:@"title"];
+				
+				mp4Chapters[i].duration = chap_len_secs * 1000.0;
+				strcpy(mp4Chapters[i].title, [chap_name cStringUsingEncoding:NSStringEncodingConversionAllowLossy]);
+				
+				//			chap_st_secs += chap_len_secs;
+				//			QTTime t_qt_time = QTMakeTime(chap_len_secs * 1000, 1000);
+				//			NSValue* m4v_chap_qttime = [NSValue valueWithQTTime:t_qt_time];
+				//			NSDictionary* new_m4v_chap = [NSDictionary dictionaryWithObjectsAndKeys:
+				//										  chap_name, QTMovieChapterName,
+				//										  m4v_chap_qttime, QTMovieChapterStartTime,
+				//										  nil];
+				//			NSDictionary* new_m4v_chap_attrs = [NSDictionary dictionaryWithObjectsAndKeys:
+				//												, nil]
+			}
+			if(_MP4SetChapters(mp4File, mp4Chapters, (unsigned int)[cchps count], MP4ChapterTypeAny) != MP4ChapterTypeAny)
+			{
+				NSLog(@"Chapters were not able to be set");
+			}
+			_MP4Close(mp4File, 0);
+			free(mp4Chapters);
+		}
 	}
 	currentTaskIdx += 1;
     if(_delegate != nil)

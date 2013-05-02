@@ -20,7 +20,7 @@
 +(NSTask*) createTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len;
 +(NSTask*) createConvertTaskWith:(NSString*)src Destination:(NSString*)dst Start:(NSString*)ss Length:(NSString*)len;
 
--(id) initWithTasks:(NSArray*)tsks;
+-(id) initWithTasks:(NSArray*)tsks Chapters:(NSArray*)chaps;
 -(void) setDelegate:(id)delegate;
 -(void) launch;
 -(void) cancel;
