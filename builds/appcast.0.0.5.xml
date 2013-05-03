@@ -5,16 +5,16 @@
       	<description>Base version.</description>
       	<language>en</language>
 		<item>
-        	<title>Version 0.0.6 (beta release 0.6)</title>
+        	<title>Version 0.0.5 (beta release 0.5)</title>
 			<sparkle:releaseNotesLink>
-				http://popmedic.com/mp4split_builds/0.0.6.html
+				http://popmedic.com/mp4split_builds/0.0.5.html
 			</sparkle:releaseNotesLink>
-          	<pubDate>Thu, 2 May 2013 19:02:33 +0700</pubDate>
+          	<pubDate>Thu, 26 Apr 2013 07:50:33 +0700</pubDate>
           	<enclosure
 			url="http://popmedic.com/mp4split_builds/latest/Mp4Split.zip"
-			sparkle:version="0.0.6"
-			sparkle:dsaSignature="MCwCFDbO8ss56IOxeBl9H4RUT25u5FvnAhReeNlMK43itUT7a9QGswuqIkuCmQ=="
-			length="6257537"
+			sparkle:version="0.0.5"
+			sparkle:dsaSignature="MCwCFHqyHCgotCYJ29Iaaj/l+8Ve52bAAhR07Vbgv73eDqRJIyn9vDys/tNk/A=="
+			length="6254185"
 			type="application/octet-stream"
 			/>
 		</item>
